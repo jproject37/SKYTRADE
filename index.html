@@ -250,22 +250,26 @@ canvas#chart{width:100%;height:100%;display:block}
 
 <script>
 /* ============================================================
-   SKYTRADE — API Key helper (untuk deployment publik)
-   Prompt user 1x, simpan di localStorage. Tidak ada secret di source.
+   SKYTRADE — API Key helper (deferred prompt v2)
+   - getSkyApiKey() = LAZY, baca dari localStorage saja (gak prompt)
+   - Prompt baru muncul setelah window.load (BG selesai render)
+   - Setelah simpan key, reload sekali biar JFX_KEY/KEY ke-refresh
 ============================================================ */
 function getSkyApiKey(){
-  var k = localStorage.getItem('sky_api_key');
-  if(!k){
-    k = prompt('🔐 Masukkan SKYTRADE API key kamu:\n(Tanya admin kalau belum punya)');
-    if(k && k.trim()){
-      k = k.trim();
-      localStorage.setItem('sky_api_key', k);
-    } else {
-      return '';
-    }
-  }
-  return k;
+  return localStorage.getItem('sky_api_key') || '';
 }
+// Tunggu sampai semua resource (BG, image, video) selesai load,
+// baru prompt API key kalau belum tersimpan.
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(localStorage.getItem('sky_api_key')) return; // udah ada, skip
+    var k = prompt('🔐 Masukkan SKYTRADE API key kamu:\n(Tanya admin kalau belum punya)');
+    if(k && k.trim()){
+      localStorage.setItem('sky_api_key', k.trim());
+      location.reload(); // refresh supaya JFX_KEY/KEY ke-update
+    }
+  }, 300);
+});
 /* ============================================================
    J-FX-SignalPRO — Smart Money Signal Engine
    Pure client-side. Real-time via Twelve Data API (optional).
