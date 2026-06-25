@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v28</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v29</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -860,7 +860,7 @@ async function jfxClose(id){
   .jfx-home-risk:active{transform:translate(-50%,-50%) scale(.93)}
   .jfx-home-risk.active{box-shadow:0 0 20px 5px rgba(40,255,140,.7);border:2px solid rgba(140,255,190,.95);background:rgba(40,255,140,.16)}
   .jfx-home-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:14px;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
-  .jfx-home-hot.start{left:49.9%;top:70%;width:22%;height:7.5%}
+  .jfx-home-hot.start{left:49.9%;top:70.75%;width:22%;height:9%}
   .jfx-home-hot.start.locked{cursor:not-allowed}
   .jfx-home-hot.logout{left:49.6%;top:80.5%;width:11%;height:5%}
   .jfx-home-hot:active{transform:translate(-50%,-50%) scale(.96)}
@@ -1026,7 +1026,7 @@ async function jfxClose(id){
   /* ===== UI4 · DASHBOARD AUTO (bg-ending.png) ===== */
   #jfxUI4{position:fixed;inset:0;z-index:9999;display:none;overflow:hidden;background:#04060d;color:#dffaee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
   .jfx-end-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:max(100vw,177.78vh);background:url('bg-ending.png') center center/100% 100% no-repeat}
-  .jfx-end-screen{position:absolute;left:48%;top:57%;transform:translate(-50%,-50%);width:30%;height:40%;display:flex;flex-direction:column;gap:.5vh;box-sizing:border-box;padding:.4vh .55vw;overflow:hidden;text-shadow:0 0 6px rgba(40,255,150,.3)}
+  .jfx-end-screen{position:absolute;left:49.5%;top:46%;transform:translate(-50%,-50%);width:24%;height:33%;display:flex;flex-direction:column;gap:.5vh;box-sizing:border-box;padding:.4vh .55vw;overflow:hidden;text-shadow:0 0 6px rgba(40,255,150,.3)}
   .es-top{display:flex;justify-content:space-between;align-items:center;gap:.4vw}
   .es-mode{font-weight:800;font-size:clamp(8px,.95vw,16px);color:#7bffc2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .es-mode.frozen{color:#ffd27b}
@@ -1053,15 +1053,15 @@ async function jfxClose(id){
   .es-empty{font-size:clamp(7px,.78vw,12px);color:#7fae97;text-align:center;padding:.6vh 0}
   .es-note{font-size:clamp(6px,.66vw,11px);color:#7fae97;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .jfx-end-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:1vw;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-end-hot.off{left:38.5%;top:82%;width:11%;height:4.5%}
-  .jfx-end-hot.kill{left:50%;top:82%;width:11%;height:4.5%}
-  .jfx-end-hot.reset{left:61.5%;top:82%;width:10%;height:4.5%}
+  .jfx-end-hot.off{left:41.2%;top:82.3%;width:8%;height:6.8%}
+  .jfx-end-hot.kill{left:49.6%;top:82.3%;width:8%;height:6.8%}
+  .jfx-end-hot.reset{left:57.7%;top:82.3%;width:8%;height:6.8%}
   .jfx-end-hot.off:hover{box-shadow:0 0 22px 5px rgba(130,150,180,.5)}
   .jfx-end-hot.kill:hover{box-shadow:0 0 24px 6px rgba(246,70,93,.55)}
   .jfx-end-hot.reset:hover{box-shadow:0 0 22px 5px rgba(240,185,11,.5)}
   .jfx-end-hot:active{transform:translate(-50%,-50%) scale(.95)}
   /* status FX: equalizer/neon — hijau jalan saat analisa, merah diam saat off */
-  .jfx-end-fx{position:absolute;left:50%;top:91.5%;transform:translate(-50%,-50%);width:30%;height:5%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;pointer-events:none}
+  .jfx-end-fx{position:absolute;left:49.7%;top:92%;transform:translate(-50%,-50%);width:25%;height:7%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;pointer-events:none}
   .es-fx-scan{position:relative;width:100%;height:58%;overflow:hidden;border-radius:3px;background:repeating-linear-gradient(90deg,rgba(22,255,163,.14) 0 1px,transparent 1px 7%)}
   .es-fx-scan .grid{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(22,255,163,.08) 0 1px,transparent 1px 33%)}
   .es-fx-scan::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(22,255,163,.3)}
