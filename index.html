@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v21</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v22</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -985,6 +985,11 @@ async function jfxClose(id){
     .jfx-mini-link{font-size:clamp(10px,3vw,14px);width:90%;text-align:center}
     .jfx-home-val{font-size:clamp(10px,3vw,14px)}
     .jfx-home-status{font-size:clamp(9px,2.6vw,13px)}
+  }
+  /* Wide / landscape screens (desktop): assets are 16:9, so CONTAIN to show the FULL artwork (no top/bottom cropping). Side bars are dark. Phones (portrait) keep COVER above. */
+  @media (min-aspect-ratio: 16/9){
+    .jfx-pre-stage,.jfx-conn-stage,.jfx-auth-stage,.jfx-home-stage,.jfx-end-stage{width:min(100vw,177.78vh)}
+    #jfxIntro video{width:auto;height:100dvh;max-height:100vh;object-fit:contain}
   }
   /* Remove hover-glow artifacts on touch (no more semburat) */
   @media (hover:none){
