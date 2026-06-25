@@ -931,7 +931,7 @@ async function jfxClose(id){
   /* panggung 16:9 yg selalu nge-cover layar (HP kepotong samping, tombol tengah tetap aman) */
   .jfx-pre-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:max(100vw,177.78vh);background:url('bg-preintro.jpg') center center/100% 100% no-repeat}
   /* cincin glow di atas tombol merah bawaan background (cuma visual; klik ditangani #jfxIntroTap) */
-  .jfx-pre-glow{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);width:7.5%;aspect-ratio:1/1;border-radius:50%;pointer-events:none;animation:jfxStartPulse 1.8s ease-in-out infinite;transition:transform .12s ease}
+  .jfx-pre-glow{position:absolute;left:50%;top:59%;transform:translate(-50%,-50%);width:7.5%;aspect-ratio:1/1;border-radius:50%;pointer-events:none;animation:jfxStartPulse 1.8s ease-in-out infinite;transition:transform .12s ease}
   #jfxIntroTap:active .jfx-pre-glow{transform:translate(-50%,-50%) scale(.9)}
   .jfx-pre-hint{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:13px;font-weight:600;letter-spacing:.2em;color:#ffdada;text-shadow:0 0 12px rgba(255,45,45,.75);animation:jfxHintBlink 1.9s ease-in-out infinite;z-index:3;pointer-events:none}
   @keyframes jfxStartPulse{0%,100%{box-shadow:0 0 18px 4px rgba(255,45,45,.32)}50%{box-shadow:0 0 48px 14px rgba(255,85,85,.82)}}
@@ -982,7 +982,7 @@ async function jfxClose(id){
   @media (max-aspect-ratio: 3/4){
     .jfx-pre-stage,.jfx-auth-stage,.jfx-conn-stage,.jfx-home-stage,.jfx-end-stage{width:100vw!important;height:100dvh!important;min-height:100vh;aspect-ratio:auto!important;background-size:cover!important;background-position:center center!important}
     #jfxIntro video{width:100vw;height:100dvh;min-height:100vh;object-fit:cover}
-    .jfx-pre-glow{width:7.5%;top:50%}
+    .jfx-pre-glow{width:7.5%;top:59%}
     .jfx-pre-hint{bottom:5.8%;font-size:clamp(11px,3.2vw,15px);letter-spacing:.16em}
 
     /* bg-auth.jpg calibrated from the real 1280x720 artwork */
