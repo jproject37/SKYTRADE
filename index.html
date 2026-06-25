@@ -159,7 +159,7 @@ canvas#chart{width:100%;height:100%;display:block}
       <div class="row">
         <div class="field">
           <label>Twelve Data API Key — untuk harga &amp; candle REAL-TIME (gratis di twelvedata.com)</label>
-          <input class="inp" id="apiKey" type="text" value="" placeholder="Tempel API key di sini lalu Generate">
+          <input class="inp" id="apiKey" type="text" value="c2e940f7835346399c7cfea5ab4158ce" placeholder="Tempel API key di sini lalu Generate">
         </div>
       </div>
       <p class="hint">Tanpa API key, aplikasi berjalan dalam <b>Mode Simulasi</b> (data sintetis) supaya kamu bisa melihat cara kerja mesin analisanya. Dengan API key gratis, harga &amp; candle menjadi <b>real-time</b> dari market sungguhan.</p>
@@ -249,27 +249,6 @@ canvas#chart{width:100%;height:100%;display:block}
 </div>
 
 <script>
-/* ============================================================
-   SKYTRADE — API Key helper (deferred prompt v2)
-   - getSkyApiKey() = LAZY, baca dari localStorage saja (gak prompt)
-   - Prompt baru muncul setelah window.load (BG selesai render)
-   - Setelah simpan key, reload sekali biar JFX_KEY/KEY ke-refresh
-============================================================ */
-function getSkyApiKey(){
-  return localStorage.getItem('sky_api_key') || '';
-}
-// Tunggu sampai semua resource (BG, image, video) selesai load,
-// baru prompt API key kalau belum tersimpan.
-window.addEventListener('load', function(){
-  setTimeout(function(){
-    if(localStorage.getItem('sky_api_key')) return; // udah ada, skip
-    var k = prompt('🔐 Masukkan SKYTRADE API key kamu:\n(Tanya admin kalau belum punya)');
-    if(k && k.trim()){
-      localStorage.setItem('sky_api_key', k.trim());
-      location.reload(); // refresh supaya JFX_KEY/KEY ke-update
-    }
-  }, 300);
-});
 /* ============================================================
    J-FX-SignalPRO — Smart Money Signal Engine
    Pure client-side. Real-time via Twelve Data API (optional).
@@ -646,7 +625,7 @@ document.getElementById("sendBtn").onclick=sendToBackend;
 function sendToBackend(){
   if(!lastR){alert("Generate sinyal dulu sebelum mengirim.");return;}
   var url="https://jfx-backend-production.up.railway.app/signal";
-  var key=getSkyApiKey();
+  var key="sky_44a89227c3a7dbc0c110dfd0b76ce0a33ef293335bccff9d";
   var R=lastR;
   var rr=Math.abs(R.entry-R.sl)>0?+(Math.abs(R.tp2-R.entry)/Math.abs(R.entry-R.sl)).toFixed(2):null;
   var payload={pair:R.cfg.sym,verdict:R.action,confidence:R.confidence,entry:R.entry,sl:R.sl,tp1:R.tp1,tp2:R.tp2,lot:R.lots,rr:rr,riskPct:R.riskPct,capital:R.capital,live:!!R.data.live,ts:new Date().toISOString()};
@@ -818,7 +797,7 @@ padding:5px 10px;cursor:pointer;font-size:12px}
 
 <script>
 const JFX_BACKEND = 'https://jfx-backend-production.up.railway.app';
-const JFX_KEY = getSkyApiKey();
+const JFX_KEY = 'sky_44a89227c3a7dbc0c110dfd0b76ce0a33ef293335bccff9d';
 function jfxToggle(open){
   document.getElementById('jfx-panel').classList.toggle('open', open);
   document.getElementById('jfx-fab').style.display = open ? 'none' : 'flex';
@@ -836,7 +815,7 @@ async function jfxRefreshPos(){
       const isBuy = String(p.type).includes('BUY');
       const pl = Number(p.profit||0);
       return '<div class="jfx-card">'
-        + '<button class="jfx-close" onclick="jfxClose(\''+p.id+'\')">Tutup</button>'
+        + '<button class="jfx-close" onclick="jfxClose(\''+p.id+'\')">Close</button>'
         + '<span class="sym">'+p.symbol+'</span> ' + (isBuy?'🟢 BUY':'🔴 SELL') + ' ' + p.volume
         + '<br><small>@ '+p.openPrice+' · P/L: <b class="'+(pl>=0?'pl-up':'pl-dn')+'">'+pl.toFixed(2)+'</b></small>'
         + '</div>';
@@ -868,26 +847,26 @@ async function jfxClose(id){
     radial-gradient(900px 500px at -10% 10%,rgba(34,211,238,.10),transparent),#0b0f1a;
     color:#e8edf7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
   #jfxHome{display:none;overflow:hidden;background:#04060d}
-  .jfx-home-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:9/16;width:min(100vw,56.25vh);background:url('bg-home.png') center center/100% 100% no-repeat}
-  .jfx-home-val{position:absolute;transform:translate(-50%,-50%);width:28%;text-align:center;color:#eafff1;font-weight:800;font-size:clamp(14px,4.5vw,22px);text-shadow:0 0 10px rgba(40,255,140,.5);pointer-events:none;white-space:nowrap;overflow:hidden}
-  .jfx-home-val.bal{left:29%;top:49%}
-  .jfx-home-val.eq{left:71%;top:49%}
-  .jfx-home-risk{position:absolute;transform:translate(-50%,-50%);top:63.5%;width:18%;height:9%;border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-home-risk.r1{left:16%}
-  .jfx-home-risk.r2{left:33%}
-  .jfx-home-risk.r3{left:51%}
-  .jfx-home-risk.r4{left:71%}
+  .jfx-home-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:min(100vw,177.78vh);background:url('bg-home.png') center center/100% 100% no-repeat}
+  .jfx-home-val{position:absolute;transform:translate(-50%,-50%);width:13%;text-align:center;color:#eafff1;font-weight:800;font-size:clamp(12px,1.5vw,24px);text-shadow:0 0 10px rgba(40,255,140,.5);pointer-events:none;white-space:nowrap;overflow:hidden}
+  .jfx-home-val.bal{left:43.5%;top:40%}
+  .jfx-home-val.eq{left:57%;top:40%}
+  .jfx-home-risk{position:absolute;transform:translate(-50%,-50%);top:52%;width:8.5%;height:6%;border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
+  .jfx-home-risk.r1{left:36.2%}
+  .jfx-home-risk.r2{left:45.3%}
+  .jfx-home-risk.r3{left:54.6%}
+  .jfx-home-risk.r4{left:63.8%}
   .jfx-home-risk:hover{box-shadow:0 0 22px 5px rgba(40,255,140,.45)}
   .jfx-home-risk:active{transform:translate(-50%,-50%) scale(.93)}
   .jfx-home-risk.active{box-shadow:0 0 26px 7px rgba(40,255,140,.8);border:2px solid rgba(140,255,190,.95);background:rgba(40,255,140,.14)}
   .jfx-home-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:16px;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-home-hot.start{left:50%;top:75.5%;width:84%;height:11%}
+  .jfx-home-hot.start{left:49.75%;top:65.5%;width:34.5%;height:11%}
   .jfx-home-hot.start:hover{box-shadow:0 0 40px 10px rgba(40,255,140,.5)}
   .jfx-home-hot.start.locked{cursor:not-allowed;opacity:.5;filter:grayscale(.55)}
-  .jfx-home-hot.logout{left:50%;top:86%;width:36%;height:7%}
+  .jfx-home-hot.logout{left:50%;top:79.75%;width:20%;height:7.5%}
   .jfx-home-hot.logout:hover{box-shadow:0 0 26px 6px rgba(255,80,80,.45)}
   .jfx-home-hot:active{transform:translate(-50%,-50%) scale(.96)}
-  .jfx-home-status{position:absolute;left:50%;top:94%;transform:translate(-50%,-50%);width:90%;height:5%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9fe9c0;font-size:clamp(11px,3vw,15px);font-weight:600;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
+  .jfx-home-status{position:absolute;left:50%;top:89%;transform:translate(-50%,-50%);width:24%;height:8%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9fe9c0;font-size:clamp(8px,0.95vw,15px);font-weight:600;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
   .jfx-hero{width:100%;max-width:600px;border-radius:20px;display:block;margin:0 auto 20px;
     box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 60px rgba(34,211,238,.12)}
   .jfx-home-inner{width:100%;display:flex;flex-direction:column;align-items:center;padding:0}
@@ -949,36 +928,52 @@ async function jfxClose(id){
   #jfxIntroTap{position:absolute;inset:0;cursor:pointer;z-index:2;overflow:hidden;background:#04060d}
   #jfxIntroTap.hide{display:none}
   /* panggung 16:9 yg selalu nge-cover layar (HP kepotong samping, tombol tengah tetap aman) */
-  .jfx-pre-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:9/16;width:min(100vw,56.25vh);background:url('bg-preintro.jpg') center center/100% 100% no-repeat}
+  .jfx-pre-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:max(100vw,177.78vh);background:url('bg-preintro.jpg') center center/100% 100% no-repeat}
   /* cincin glow di atas tombol merah bawaan background (cuma visual; klik ditangani #jfxIntroTap) */
-  .jfx-pre-glow{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);width:24%;aspect-ratio:1/1;border-radius:50%;pointer-events:none;animation:jfxStartPulse 1.8s ease-in-out infinite;transition:transform .12s ease}
+  .jfx-pre-glow{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);width:15%;aspect-ratio:1/1;border-radius:50%;pointer-events:none;animation:jfxStartPulse 1.8s ease-in-out infinite;transition:transform .12s ease}
   #jfxIntroTap:active .jfx-pre-glow{transform:translate(-50%,-50%) scale(.9)}
   .jfx-pre-hint{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:13px;font-weight:600;letter-spacing:.2em;color:#ffdada;text-shadow:0 0 12px rgba(255,45,45,.75);animation:jfxHintBlink 1.9s ease-in-out infinite;z-index:3;pointer-events:none}
   @keyframes jfxStartPulse{0%,100%{box-shadow:0 0 18px 4px rgba(255,45,45,.32)}50%{box-shadow:0 0 48px 14px rgba(255,85,85,.82)}}
   @keyframes jfxHintBlink{0%,100%{opacity:.4}50%{opacity:1}}
   /* ===== ONBOARDING SCREENS ===== */
   #jfxConnect{position:fixed;inset:0;z-index:10000;display:none;overflow:hidden;background:#04060d}
-  .jfx-conn-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:9/16;width:min(100vw,56.25vh);background:url('bg-connect.png') center center/100% 100% no-repeat}
-  .jfx-conn-input{position:absolute;left:59%;transform:translate(-50%,-50%);width:56%;height:6%;box-sizing:border-box;background:transparent;border:none;outline:none;color:#d9ffe6;font-size:clamp(13px,3.6vw,20px);font-weight:600;letter-spacing:.3px;text-align:left;padding:0 2%;text-shadow:0 0 7px rgba(57,255,138,.5);caret-color:#39ff8a;-webkit-tap-highlight-color:transparent}
+  .jfx-conn-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:min(100vw,177.78vh);background:url('bg-connect.png') center center/100% 100% no-repeat}
+  .jfx-conn-input{position:absolute;left:50%;transform:translate(-50%,-50%);width:30%;height:5%;box-sizing:border-box;background:transparent;border:none;outline:none;color:#d9ffe6;font-size:clamp(11px,1.35vw,20px);font-weight:600;letter-spacing:.3px;text-align:left;padding:0 1.4%;text-shadow:0 0 7px rgba(57,255,138,.5);caret-color:#39ff8a;-webkit-tap-highlight-color:transparent}
   .jfx-conn-input::placeholder{color:rgba(120,200,150,.40)}
   .jfx-conn-input:focus{background:transparent;box-shadow:none;text-shadow:0 0 10px rgba(57,255,138,.75)}
-  .jfx-conn-input.cn-id{top:45%}
-  .jfx-conn-input.cn-pass{top:53%}
-  .jfx-conn-input.cn-server{top:61%}
-  #jfxConnect #cnStatus{position:absolute;left:50%;top:69%;transform:translate(-50%,-50%);width:80%;text-align:center;z-index:6;font-size:clamp(11px,3vw,16px);color:#7bffc2}
+  .jfx-conn-input.cn-id{top:38.5%}
+  .jfx-conn-input.cn-pass{top:50.3%}
+  .jfx-conn-input.cn-server{top:61.9%}
+  .jfx-conn-input.cn-license{top:71.8%;text-align:center;letter-spacing:1.2px;text-transform:uppercase}
+  #jfxConnect #cnStatus{position:absolute;left:50%;top:77.2%;transform:translate(-50%,-50%);width:70%;text-align:center;z-index:6;font-size:clamp(11px,1.15vw,17px);line-height:1.35}
+  .jfx-license-admin #cnLicense{display:none}
+  .jfx-license-admin #jfxConnect #cnStatus{top:71%}
+  .jfx-mini-link{position:absolute;left:50%;transform:translateX(-50%);top:88.6%;z-index:7;color:#aefad0;font-size:clamp(10px,1vw,15px);font-weight:700;text-decoration:underline;cursor:pointer;text-shadow:0 0 9px rgba(57,255,138,.45)}
+  .jfx-license-admin .jfx-mini-link{display:none}
+  #jfxSignupModal{position:fixed;inset:0;z-index:12000;display:none;align-items:center;justify-content:center;background:rgba(2,6,18,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:18px;box-sizing:border-box}
+  #jfxSignupModal.show{display:flex}
+  .jfx-signup-card{width:min(92vw,420px);border:1px solid rgba(57,255,138,.28);border-radius:18px;background:linear-gradient(180deg,rgba(12,22,35,.96),rgba(4,9,18,.96));box-shadow:0 24px 90px rgba(0,0,0,.65),0 0 28px rgba(57,255,138,.12);padding:20px;color:#eafff2;font-family:Arial,sans-serif}
+  .jfx-signup-card h3{margin:0 0 6px;font-size:21px}
+  .jfx-signup-card p{margin:0 0 14px;color:#9adbb7;font-size:13px;line-height:1.45}
+  .jfx-signup-card input{width:100%;box-sizing:border-box;margin:7px 0;padding:12px 13px;border-radius:11px;border:1px solid rgba(154,219,183,.22);background:#07111f;color:#eafff2;font-size:15px;outline:none}
+  .jfx-signup-card input:focus{border-color:#39ff8a;box-shadow:0 0 0 3px rgba(57,255,138,.12)}
+  .jfx-signup-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .jfx-signup-actions button{border:0;border-radius:11px;padding:12px;font-weight:800;cursor:pointer}
+  #sgSubmit{background:linear-gradient(135deg,#39ff8a,#12c971);color:#03140a}
+  #sgClose{background:rgba(255,255,255,.08);color:#eafff2;border:1px solid rgba(255,255,255,.14)}
+  #sgMsg{min-height:18px;margin-top:10px;font-size:13px;color:#aefad0;line-height:1.4}
   .jfx-conn-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:14px;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-conn-hot.connect{left:50%;top:76.5%;width:84%;height:13%}
-  .jfx-conn-hot.back{left:14%;top:6%;width:20%;height:5%;transform:none;background:rgba(0,255,200,.06);border:1px solid rgba(0,255,200,.32);display:flex;align-items:center;justify-content:center;color:#7bffc2;font-weight:700;font-size:clamp(11px,3vw,15px);letter-spacing:.05em}
-  .jfx-conn-hot.back::before{content:"\2190 BACK"}
+  .jfx-conn-hot.connect{left:50.2%;top:82.5%;width:23.2%;height:10.9%}
+  .jfx-conn-hot.back{left:51.5%;top:93.1%;width:20.1%;height:9.9%}
   .jfx-conn-hot.connect:hover{box-shadow:0 0 16px 1px rgba(40,255,140,.42)}
   .jfx-conn-hot.back:hover{box-shadow:0 0 14px 1px rgba(40,255,140,.4)}
   .jfx-conn-hot:active{transform:translate(-50%,-50%) scale(.95)}
   /* ===== AUTH (Sign Up / Login): bg full-bleed + hotspot di atas tombol bawaan ===== */
   #jfxAuth{position:fixed;inset:0;z-index:10000;display:none;overflow:hidden;background:#04060d}
-  .jfx-auth-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:9/16;width:min(100vw,56.25vh);background:url('bg-auth.jpg') center center/100% 100% no-repeat}
-  .jfx-auth-hot{position:absolute;left:50%;transform:translate(-50%,-50%);width:76%;height:12%;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-auth-hot.signup{top:44%}
-  .jfx-auth-hot.login{top:61%}
+  .jfx-auth-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:max(100vw,177.78vh);background:url('bg-auth.jpg') center center/100% 100% no-repeat}
+  .jfx-auth-hot{position:absolute;left:49.75%;transform:translate(-50%,-50%);width:30.5%;height:13.5%;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
+  .jfx-auth-hot.signup{top:50%}
+  .jfx-auth-hot.login{top:69%}
   .jfx-auth-hot:active{transform:translate(-50%,-50%) scale(.95)}
   .jfx-auth-hot.signup:hover{box-shadow:0 0 30px 7px rgba(255,60,60,.45)}
   .jfx-auth-hot.login:hover{box-shadow:0 0 30px 7px rgba(60,255,120,.45)}
@@ -1011,50 +1006,49 @@ async function jfxClose(id){
   @keyframes jfxspin{to{transform:rotate(360deg)}}
   /* ===== UI4 · DASHBOARD AUTO (bg-ending.png) ===== */
   #jfxUI4{position:fixed;inset:0;z-index:9999;display:none;overflow:hidden;background:#04060d;color:#dffaee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-  .jfx-end-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:9/16;width:min(100vw,56.25vh);background:url('bg-ending.png') center center/100% 100% no-repeat}
-  .jfx-end-screen{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);width:64%;height:38%;display:flex;flex-direction:column;gap:.6vh;box-sizing:border-box;padding:.6vh 1.5vw;overflow:hidden;text-shadow:0 0 6px rgba(40,255,150,.3)}
-  .es-money label{display:none}
+  .jfx-end-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:min(100vw,177.78vh);background:url('bg-ending.png') center center/100% 100% no-repeat}
+  .jfx-end-screen{position:absolute;left:50%;top:53.75%;transform:translate(-50%,-50%);width:40%;height:41.5%;display:flex;flex-direction:column;gap:.5vh;box-sizing:border-box;padding:.4vh .55vw;overflow:hidden;text-shadow:0 0 6px rgba(40,255,150,.3)}
   .es-top{display:flex;justify-content:space-between;align-items:center;gap:.4vw}
-  .es-mode{font-weight:800;font-size:clamp(10px,2.6vw,15px);color:#7bffc2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .es-mode{font-weight:800;font-size:clamp(8px,.95vw,16px);color:#7bffc2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .es-mode.frozen{color:#ffd27b}
-  .es-engine{font-weight:800;font-size:clamp(10px,2.5vw,14px);padding:.05em .55em;border-radius:999px;white-space:nowrap}
+  .es-engine{font-weight:800;font-size:clamp(8px,.92vw,15px);padding:.05em .55em;border-radius:999px;white-space:nowrap}
   .es-engine.on{color:#16ffa3;border:1px solid rgba(22,255,163,.55)}
   .es-engine.off{color:#ff9a9a;border:1px solid rgba(255,138,138,.5)}
   .es-engine.kill{color:#ffd24d;border:1px solid rgba(255,210,77,.6)}
   .es-money{display:flex;gap:.6vw}
-  .es-cell{flex:1;background:rgba(2,22,13,.4);border:1px solid rgba(40,255,150,.2);border-radius:6px;padding:.5vh 2vw;min-width:0}
-  .es-cell label{display:block;font-size:clamp(9px,2.2vw,11px);color:#8fdcb6;font-weight:600;letter-spacing:.04em}
-  .es-cell b{display:block;font-size:clamp(12px,3.6vw,18px);font-weight:800;color:#eafff5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .es-pl{font-size:clamp(11px,2.8vw,15px);font-weight:800;color:#bfe9d4}
+  .es-cell{flex:1;background:rgba(2,22,13,.4);border:1px solid rgba(40,255,150,.2);border-radius:.55vw;padding:.4vh .55vw;min-width:0}
+  .es-cell label{display:block;font-size:clamp(7px,.7vw,12px);color:#8fdcb6;font-weight:600;letter-spacing:.04em}
+  .es-cell b{display:block;font-size:clamp(9px,1.1vw,19px);font-weight:800;color:#eafff5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .es-pl{font-size:clamp(8px,.95vw,16px);font-weight:800;color:#bfe9d4}
   .es-pl.pos{color:#16ffa3}
   .es-pl.neg{color:#ff7a7a}
-  .es-poshead{display:flex;justify-content:space-between;font-size:clamp(9px,2.3vw,12px);color:#8fdcb6;font-weight:600}
+  .es-poshead{display:flex;justify-content:space-between;font-size:clamp(7px,.72vw,12px);color:#8fdcb6;font-weight:600}
   .es-poslist{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.3vh;-webkit-overflow-scrolling:touch}
-  .es-pos{display:flex;justify-content:space-between;gap:.4vw;font-size:clamp(10px,2.5vw,13px);background:rgba(2,22,13,.35);border-radius:6px;padding:.4vh 1.4vw;white-space:nowrap}
+  .es-pos{display:flex;justify-content:space-between;gap:.4vw;font-size:clamp(7px,.8vw,13px);background:rgba(2,22,13,.35);border-radius:.4vw;padding:.25vh .5vw;white-space:nowrap}
   .es-pos .sym{font-weight:700;color:#eafff5;overflow:hidden;text-overflow:ellipsis}
   .es-pos .dir{font-weight:800}
   .es-pos.buy .dir{color:#16ffa3}
   .es-pos.sell .dir{color:#ff7a7a}
   .es-pos .pl.pos{color:#16ffa3}
   .es-pos .pl.neg{color:#ff7a7a}
-  .es-empty{font-size:clamp(10px,2.5vw,13px);color:#7fae97;text-align:center;padding:.6vh 0}
+  .es-empty{font-size:clamp(7px,.78vw,12px);color:#7fae97;text-align:center;padding:.6vh 0}
   .es-note{font-size:clamp(6px,.66vw,11px);color:#7fae97;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .jfx-end-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:1vw;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-end-hot.off{left:20%;top:79.5%;width:24%;height:8%}
-  .jfx-end-hot.kill{left:50%;top:79.5%;width:27%;height:8%}
-  .jfx-end-hot.reset{left:79%;top:79.5%;width:25%;height:8%}
+  .jfx-end-hot.off{left:32.5%;top:84.5%;width:15%;height:9%}
+  .jfx-end-hot.kill{left:50%;top:84.5%;width:15%;height:9%}
+  .jfx-end-hot.reset{left:67.5%;top:84.5%;width:15%;height:9%}
   .jfx-end-hot.off:hover{box-shadow:0 0 22px 5px rgba(130,150,180,.5)}
   .jfx-end-hot.kill:hover{box-shadow:0 0 24px 6px rgba(246,70,93,.55)}
   .jfx-end-hot.reset:hover{box-shadow:0 0 22px 5px rgba(240,185,11,.5)}
   .jfx-end-hot:active{transform:translate(-50%,-50%) scale(.95)}
   /* status FX: equalizer/neon — hijau jalan saat analisa, merah diam saat off */
-  .jfx-end-fx{position:absolute;left:50%;top:90%;transform:translate(-50%,-50%);width:82%;height:7%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;pointer-events:none}
+  .jfx-end-fx{position:absolute;left:50%;top:94.5%;transform:translate(-50%,-50%);width:44%;height:7%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;pointer-events:none}
   .es-fx-scan{position:relative;width:100%;height:58%;overflow:hidden;border-radius:3px;background:repeating-linear-gradient(90deg,rgba(22,255,163,.14) 0 1px,transparent 1px 7%)}
   .es-fx-scan .grid{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(22,255,163,.08) 0 1px,transparent 1px 33%)}
   .es-fx-scan::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(22,255,163,.3)}
   .es-fx-scan .beam{position:absolute;top:0;bottom:0;left:0;width:13%;background:linear-gradient(90deg,transparent,rgba(22,255,163,.5) 70%,rgba(200,255,230,.95));box-shadow:0 0 14px 3px rgba(22,255,163,.5);animation:esscan 2.1s linear infinite}
   @keyframes esscan{0%{transform:translateX(-120%)}100%{transform:translateX(780%)}}
-  .es-fx-label{font-size:clamp(10px,2.5vw,13px);font-weight:800;letter-spacing:.12em;color:#7bffc2;text-shadow:0 0 8px rgba(22,255,163,.65);white-space:nowrap;animation:esglow 1.8s ease-in-out infinite}
+  .es-fx-label{font-size:clamp(7px,.72vw,12px);font-weight:800;letter-spacing:.12em;color:#7bffc2;text-shadow:0 0 8px rgba(22,255,163,.65);white-space:nowrap;animation:esglow 1.8s ease-in-out infinite}
   @keyframes esglow{0%,100%{opacity:.72;text-shadow:0 0 5px rgba(22,255,163,.35)}50%{opacity:1;text-shadow:0 0 13px rgba(22,255,163,.95)}}
   .jfx-end-fx.off .es-fx-scan{display:none}
   .jfx-end-fx.off .es-fx-label{animation:none;opacity:.92;color:#ff8a8a;text-shadow:0 0 8px rgba(255,90,90,.5)}
@@ -1103,9 +1097,26 @@ async function jfxClose(id){
     <input id="cnLogin" class="jfx-conn-input cn-id" type="text" inputmode="numeric" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. 51234567">
     <input id="cnPass" class="jfx-conn-input cn-pass" type="password" autocomplete="off" placeholder="trading account password">
     <input id="cnServer" class="jfx-conn-input cn-server" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="e.g. TradingProInternational-Demo">
+    <input id="cnLicense" class="jfx-conn-input cn-license" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ACCESS / LICENSE KEY">
     <div id="cnStatus"></div>
     <div class="jfx-conn-hot connect" id="cnSubmit" role="button" tabindex="0" aria-label="Connect & Activate"></div>
+    <div class="jfx-mini-link" id="cnDaftar" role="button" tabindex="0">Don’t have a code? Request access</div>
     <div class="jfx-conn-hot back" id="cnBack" role="button" tabindex="0" aria-label="Back"></div>
+  </div>
+</div>
+
+<!-- MODAL DAFTAR AKSES / LISENSI -->
+<div id="jfxSignupModal" aria-hidden="true">
+  <div class="jfx-signup-card">
+    <h3>Request SKYTRADE Access</h3>
+    <p>Enter your name and WhatsApp number. After admin approval, your access code will be sent manually via WhatsApp.</p>
+    <input id="sgNama" type="text" autocomplete="name" placeholder="Name">
+    <input id="sgWa" type="tel" autocomplete="tel" placeholder="WhatsApp Number">
+    <div class="jfx-signup-actions">
+      <button id="sgSubmit" type="button">Submit Request</button>
+      <button id="sgClose" type="button">Close</button>
+    </div>
+    <div id="sgMsg"></div>
   </div>
 </div>
 
@@ -1169,7 +1180,12 @@ async function jfxClose(id){
 (function(){
   // ⬇️ Backend kamu (kalau URL/key berubah, ganti di 2 baris ini saja)
   var BE  = "https://jfx-backend-production.up.railway.app";
-  var KEY = getSkyApiKey();
+  var KEY = "sky_44a89227c3a7dbc0c110dfd0b76ce0a33ef293335bccff9d";
+  // MOBILE production: /connect always requires a valid license key.
+  // IMPORTANT: replace this with your admin WhatsApp number in international format, without + or spaces.
+  // Example: "6281234567890"
+  var ADMIN_WA = "6281252687977";
+  var LIC_KEY = 'jfx_kode_lisensi';
 
   var home=document.getElementById('jfxHome'),
       auto=document.getElementById('jfxAuto'),
@@ -1265,14 +1281,22 @@ async function jfxClose(id){
   })();
   function bootRoute(){
     // GERBANG LOGIN: device ini WAJIB sudah login (punya sesi lokal) sebelum boleh lihat dashboard.
-    // Tanpa sesi lokal -> selalu ke layar login, walau engine sedang ON di server.
+    // MOBILE juga wajib punya kode lisensi yang masih valid setiap mau masuk.
     var acc=''; try{ acc=localStorage.getItem('jfx_account')||''; }catch(e){}
     if(!acc){ showAuthScreen(); return; }
-    api('/auto/status').then(function(j){
-      var a=j&&j.auto;
-      if(a && a.enabled){ showUI4(); return; }
-      showHome();
-    }).catch(function(){ showHome(); });
+    var continueRoute=function(){
+      api('/auto/status').then(function(j){
+        var a=j&&j.auto;
+        if(a && a.enabled){ showUI4(); return; }
+        showHome();
+      }).catch(function(){ showHome(); });
+    };
+    var kode=''; try{ kode=localStorage.getItem(LIC_KEY)||''; }catch(e){}
+    if(!kode){ showAuthScreen(); return; }
+    cekLisensi(kode).then(continueRoute).catch(function(){
+      try{ localStorage.removeItem('jfx_account'); localStorage.removeItem(LIC_KEY); }catch(e){}
+      showAuthScreen();
+    });
   }
   function _enableThenWarm(){
     if(homeStatus) homeStatus.innerHTML='Starting engine & connecting to broker...';
@@ -1341,9 +1365,9 @@ async function jfxClose(id){
   document.getElementById('jfxAutoBack').onclick=showHome;
   function logout(){
     try{ fetch(BE+'/session/stop',{method:'POST',headers:{'x-api-key':KEY},keepalive:true}); }catch(e){}
-    try{ localStorage.removeItem('jfx_account'); localStorage.removeItem('jfx_mt_pending'); localStorage.removeItem(RISK_KEY); }catch(e){}
-    var l=document.getElementById('cnLogin'),p=document.getElementById('cnPass'),s=document.getElementById('cnServer'),st=document.getElementById('cnStatus');
-    if(l)l.value=''; if(p)p.value=''; if(s)s.value='';
+    try{ localStorage.removeItem('jfx_account'); localStorage.removeItem('jfx_mt_pending'); localStorage.removeItem(RISK_KEY); localStorage.removeItem(LIC_KEY); }catch(e){}
+    var l=document.getElementById('cnLogin'),p=document.getElementById('cnPass'),s=document.getElementById('cnServer'),lic=document.getElementById('cnLicense'),st=document.getElementById('cnStatus');
+    if(l)l.value=''; if(p)p.value=''; if(s)s.value=''; if(lic)lic.value='';
     if(st)st.innerHTML='';
     try{ highlightRisk(0); if(homeStatus) homeStatus.innerHTML=''; }catch(e){}
     try{ lockModes(true); }catch(e){}
@@ -1354,13 +1378,48 @@ async function jfxClose(id){
   // ===== ONBOARDING NAV WIRING =====
   document.getElementById('jfxToConnect').onclick=showConnectScreen;
   document.getElementById('cnBack').onclick=showAuthScreen;
+  var _licInput=document.getElementById('cnLicense'); try{ if(_licInput) _licInput.value=localStorage.getItem(LIC_KEY)||''; }catch(e){}
   var cnStatus=document.getElementById('cnStatus');
+  (function wireDaftar(){
+    var open=document.getElementById('cnDaftar'), modal=document.getElementById('jfxSignupModal'), close=document.getElementById('sgClose'), submit=document.getElementById('sgSubmit'), msg=document.getElementById('sgMsg');
+    function show(){ if(modal){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); } }
+    function hide(){ if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); } }
+    if(open) open.onclick=show; if(close) close.onclick=hide;
+    if(submit) submit.onclick=function(){
+      var nama=(document.getElementById('sgNama').value||'').trim(), wa=(document.getElementById('sgWa').value||'').trim();
+      if(!nama||!wa){ msg.textContent='Name and WhatsApp number are required.'; return; }
+      submit.disabled=true; msg.textContent='Submitting request...'
+      fetch(BE+'/daftar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nama:nama,wa:wa})})
+        .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {ok:r.ok,j:j,status:r.status}; }); })
+        .then(function(o){
+          if(!o.ok||!o.j||o.j.ok===false) throw new Error((o.j&&o.j.error)||('HTTP '+o.status));
+          var j=o.j;
+          var exp=''; try{ exp=new Date(j.aktifSampai).toLocaleDateString('en-GB',{timeZone:'Asia/Jakarta'}); }catch(e){}
+          var text='New SKYTRADE access request\n\n'
+            +'Name: '+nama+'\n'
+            +'WhatsApp: '+wa+'\n'
+            +'Request ID: '+(j.id||'-')+'\n\n'
+            +'Please approve this user and send the license key.\n\n'
+            +'License key is: '+(j.kode||'-')+'\n'
+            +'Valid for: '+(j.days||30)+' days'+(exp?(' (until '+exp+')'):'')+'\n\n'
+            +'Copy this license key and send it to the end user WhatsApp number above.';
+          msg.textContent='License generated. Opening WhatsApp admin...';
+          if(!ADMIN_WA || /X/.test(ADMIN_WA)){
+            msg.textContent='License generated: '+(j.kode||'-')+'. Admin WhatsApp number is not set in HTML yet.';
+            return;
+          }
+          window.open('https://wa.me/'+ADMIN_WA+'?text='+encodeURIComponent(text),'_blank');
+        })
+        .catch(function(e){ msg.textContent='Request failed: '+((e&&e.message)||'network'); })
+        .finally(function(){ submit.disabled=false; });
+    };
+  })();
   document.getElementById('cnSubmit').onclick=connectAccount;
   function fmtNum(v){ return (v==null||isNaN(v))?'-':Number(v).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function showBalance(a, accountId){
     try{ localStorage.setItem('jfx_account', accountId||''); }catch(e){}
-    cnStatus.innerHTML='<span class="jfx-pill on">🟢 Terhubung ke MetaApi</span>'
-      +' &nbsp;\u2713 masuk ke app...';
+    cnStatus.innerHTML='<span class="jfx-pill on">🟢 Connected to MetaApi</span>'
+      +' &nbsp;\u2713 entering app...';
     try{ localStorage.setItem('jfx_acc_info', JSON.stringify({login:a.login,broker:a.broker,server:a.server,balance:a.balance,equity:a.equity,currency:a.currency})); }catch(e){}
     setTimeout(function(){ showHome(); }, 1300);
   }
@@ -1385,13 +1444,41 @@ async function jfxClose(id){
       })
       .catch(function(){ setTimeout(function(){ pollStatus(accountId, tries+1); }, 4000); });
   }
+  function normKode(v){ return String(v||'').trim().toUpperCase().replace(/\s+/g,''); }
+  function translateLicenseError(msg){
+    msg=String(msg||'');
+    if(/tidak ditemukan/i.test(msg)) return 'Access code not found.';
+    if(/dicabut/i.test(msg)) return 'This access code has been revoked by admin.';
+    if(/expired|kadaluarsa/i.test(msg)) return 'This access code has expired. Contact admin to extend it.';
+    if(/wajib/i.test(msg)) return 'Access code is required.';
+    return msg;
+  }
+  function cekLisensi(kode){
+    return fetch(BE+'/lisensi/cek',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kode:kode})})
+      .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
+      .then(function(o){
+        if(!o.ok || !o.j) throw new Error('Failed to check license (HTTP '+o.status+')');
+        if(!o.j.valid) throw new Error(translateLicenseError(o.j.reason || o.j.error) || 'Invalid access code');
+        try{ localStorage.setItem(LIC_KEY,kode); }catch(e){}
+        return o.j;
+      });
+  }
   function connectAccount(){
     var lg=document.getElementById('cnLogin').value.trim(),
         pw=document.getElementById('cnPass').value.trim(),
-        sv=(document.getElementById('cnServer').value||'').trim();
+        sv=(document.getElementById('cnServer').value||'').trim(),
+        licEl=document.getElementById('cnLicense'),
+        kode=normKode(licEl?licEl.value:localStorage.getItem(LIC_KEY));
     if(!lg||!pw||!sv){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ Enter your ID, password & server first</span>'; return; }
-    cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Registering account to MetaApi...</span>';
-    fetch(BE+'/connect',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':KEY},body:JSON.stringify({login:lg,password:pw,server:sv,platform:'mt4'})})
+    if(!kode){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ Enter your access / license key first</span>'; return; }
+    cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Checking license...</span>';
+    var afterLicense = cekLisensi(kode);
+    afterLicense.then(function(){
+      cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Registering account to MetaApi...</span>';
+      var payload={login:lg,password:pw,server:sv,platform:'mt4'};
+      payload.kodeLisensi=kode;
+      return fetch(BE+'/connect',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':KEY},body:JSON.stringify(payload)});
+    })
       .then(function(r){ return r.text().then(function(t){ var j=null; try{ j=JSON.parse(t); }catch(e){} return {ok:r.ok,status:r.status,j:j,raw:t}; }); })
       .then(function(res){
         if(!res.ok || !res.j || !res.j.accountId){
@@ -1402,7 +1489,7 @@ async function jfxClose(id){
         }
         pollStatus(res.j.accountId, 0);
       })
-      .catch(function(err){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ Could not reach server ('+((err&&err.message)||'network')+'). Check connection / backend URL.</span>'; });
+      .catch(function(err){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ '+((err&&err.message)||'Could not reach server')+'</span>'; });
   }
   var riskConfirm=document.getElementById('jfxRiskConfirm');
   if(riskConfirm) riskConfirm.onclick=function(){ if(!localStorage.getItem(RISK_KEY)){ alert('Choose your daily risk limit first.'); return; } riskModal.classList.remove('show'); };
@@ -1436,7 +1523,7 @@ var box=document.getElementById('jfxStatusBox'),
 t=document.getElementById('jfxStatusText'),
 s=document.getElementById('jfxSince');
 if(a.killSwitch){ box.className='jfx-status kill'; t.textContent='🚨 LOCKED'; }
-else if(a.enabled){ box.className='jfx-status on'; t.textContent='���� ON'; }
+else if(a.enabled){ box.className='jfx-status on'; t.textContent='🟢 ON'; }
 else { box.className='jfx-status off'; t.textContent='🔴 OFF'; }
 if(a.since){ try{ s.textContent='Last changed: '+new Date(a.since).toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})+' WIB'; }catch(e){} }
 }
