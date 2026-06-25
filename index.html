@@ -860,9 +860,9 @@ async function jfxClose(id){
   .jfx-home-risk:active{transform:translate(-50%,-50%) scale(.93)}
   .jfx-home-risk.active{box-shadow:0 0 20px 5px rgba(40,255,140,.7);border:2px solid rgba(140,255,190,.95);background:rgba(40,255,140,.16)}
   .jfx-home-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:14px;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
-  .jfx-home-hot.start{left:49.9%;top:71.3%;width:30%;height:10.5%}
+  .jfx-home-hot.start{left:49.9%;top:70%;width:22%;height:7.5%}
   .jfx-home-hot.start.locked{cursor:not-allowed}
-  .jfx-home-hot.logout{left:49.6%;top:82.4%;width:13%;height:6%}
+  .jfx-home-hot.logout{left:49.6%;top:80.5%;width:11%;height:5%}
   .jfx-home-hot:active{transform:translate(-50%,-50%) scale(.96)}
   .jfx-home-status{position:absolute;left:49.7%;top:91%;transform:translate(-50%,-50%);width:20%;height:5.5%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9fe9c0;font-size:clamp(8px,2vw,14px);font-weight:600;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
   .jfx-hero{width:100%;max-width:600px;border-radius:20px;display:block;margin:0 auto 20px;
@@ -1318,27 +1318,27 @@ async function jfxClose(id){
     });
   }
   function _enableThenWarm(){
-    if(homeStatus) homeStatus.innerHTML='Starting engine & connecting to broker...';
+    if(homeStatus) homeStatus.innerHTML='System is starting….';
     fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}})
       .then(function(r){ return r.json().then(function(j){ return {r:r,j:j}; }); })
       .then(function(o){
         if(o.r.status===409 && o.j && /kill/i.test(o.j.error||'')){
-          if(homeStatus) homeStatus.innerHTML='Unlocking first...';
+          if(homeStatus) homeStatus.innerHTML='System is starting….';
           return fetch(BE+"/auto/reset",{method:"POST",headers:{"x-api-key":KEY}}).then(function(){ return fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}}); }).then(function(r2){ return r2.json(); });
         }
         if(o.j && o.j.ok===false && o.j.error){ throw new Error(o.j.error); }
         return o.j;
       })
       .then(function(){ warmThenUI4(0); })
-      .catch(function(e){ if(homeStatus) homeStatus.innerHTML='Failed to start: '+((e&&e.message)||'check connection')+'. Try again.'; });
+      .catch(function(e){ if(homeStatus) homeStatus.innerHTML='System is starting….'; });
   }
   function warmThenUI4(tries){
     var MAX=8;
-    if(homeStatus) homeStatus.innerHTML='Engine connecting to broker... ('+(tries*4)+'s)';
+    if(homeStatus) homeStatus.innerHTML='System is starting….';
     fetch(BE+'/monitor',{headers:{'x-api-key':KEY}}).then(function(r){return r.json();})
       .then(function(j){
-        if(j && j.connected){ if(homeStatus) homeStatus.innerHTML='Connected \u2713 opening dashboard...'; setTimeout(showUI4,500); return; }
-        if(tries>=MAX){ if(homeStatus) homeStatus.innerHTML='Opening dashboard...'; setTimeout(showUI4,500); return; }
+        if(j && j.connected){ if(homeStatus) homeStatus.innerHTML='System is starting….'; setTimeout(showUI4,500); return; }
+        if(tries>=MAX){ if(homeStatus) homeStatus.innerHTML='System is starting….'; setTimeout(showUI4,500); return; }
         setTimeout(function(){ warmThenUI4(tries+1); }, 4000);
       })
       .catch(function(){ if(tries>=MAX){ setTimeout(showUI4,300); } else setTimeout(function(){ warmThenUI4(tries+1); }, 4000); });
