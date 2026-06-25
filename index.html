@@ -982,13 +982,15 @@ async function jfxClose(id){
   @media (max-aspect-ratio: 3/4){
     .jfx-pre-stage,.jfx-auth-stage,.jfx-conn-stage,.jfx-home-stage,.jfx-end-stage{width:100vw!important;height:100dvh!important;min-height:100vh;aspect-ratio:auto!important;background-size:cover!important;background-position:center center!important}
     #jfxIntro video{width:100vw;height:100dvh;min-height:100vh;object-fit:cover}
-    .jfx-pre-glow{width:7.5%;top:43.5%}
+    .jfx-pre-glow{width:7.5%;top:50%}
     .jfx-pre-hint{bottom:5.8%;font-size:clamp(11px,3.2vw,15px);letter-spacing:.16em}
 
     /* bg-auth.jpg calibrated from the real 1280x720 artwork */
-    .jfx-auth-hot{left:50%;width:78%;height:15.8%}
-    .jfx-auth-hot.signup{top:50.5%}
-    .jfx-auth-hot.login{top:72.5%}
+    .jfx-auth-hot{left:50%;width:46.8%;height:15.8%;background:transparent!important;box-shadow:none!important;outline:none!important;opacity:1!important}
+    .jfx-auth-hot.signup{top:55.2%}
+    .jfx-auth-hot.login{top:77.2%}
+    .jfx-auth-hot.signup:hover,.jfx-auth-hot.login:hover{box-shadow:none!important}
+    .jfx-auth-hot:active{transform:translate(-50%,-50%) scale(.98)}
 
     /* bg-connect.png calibrated from the real 1280x720 artwork */
     .jfx-conn-input{left:56%;width:53%;height:4.9%;font-size:clamp(11px,3.3vw,17px);padding:0 2.7%;text-align:left}
