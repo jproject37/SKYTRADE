@@ -922,15 +922,16 @@ async function jfxClose(id){
   .jfx-week b{color:#22d3ee}
   .jfx-lock{margin-top:10px;font-size:12px;color:#ffb4b4;text-align:center}
   .jfx-ok{margin-top:10px;font-size:12px;color:#9affc4;text-align:center;display:none}
-  #jfxIntro{position:fixed;inset:0;z-index:11000;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease}
+  #jfxIntro{position:fixed;inset:0;z-index:11000;background:#000 url('bg-preintro.jpg') center center/cover no-repeat;display:flex;align-items:center;justify-content:center;transition:opacity .6s ease}
   #jfxIntro.hide{opacity:0;pointer-events:none}
-  #jfxIntro video{width:100%;height:100%;object-fit:cover}
+  #jfxIntro video{width:100%;height:100%;object-fit:cover;background:url('bg-preintro.jpg') center center/cover no-repeat;opacity:0;transition:opacity .25s ease}
+  #jfxIntro video.jfx-video-on{opacity:1}
   #jfxIntroTap{position:absolute;inset:0;cursor:pointer;z-index:2;overflow:hidden;background:#04060d}
   #jfxIntroTap.hide{display:none}
   /* panggung 16:9 yg selalu nge-cover layar (HP kepotong samping, tombol tengah tetap aman) */
   .jfx-pre-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);aspect-ratio:16/9;width:max(100vw,177.78vh);background:url('bg-preintro.jpg') center center/100% 100% no-repeat}
   /* cincin glow di atas tombol merah bawaan background (cuma visual; klik ditangani #jfxIntroTap) */
-  .jfx-pre-glow{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);width:15%;aspect-ratio:1/1;border-radius:50%;pointer-events:none;animation:jfxStartPulse 1.8s ease-in-out infinite;transition:transform .12s ease}
+  .jfx-pre-glow{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);width:7.5%;aspect-ratio:1/1;border-radius:50%;pointer-events:none;animation:jfxStartPulse 1.8s ease-in-out infinite;transition:transform .12s ease}
   #jfxIntroTap:active .jfx-pre-glow{transform:translate(-50%,-50%) scale(.9)}
   .jfx-pre-hint{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:13px;font-weight:600;letter-spacing:.2em;color:#ffdada;text-shadow:0 0 12px rgba(255,45,45,.75);animation:jfxHintBlink 1.9s ease-in-out infinite;z-index:3;pointer-events:none}
   @keyframes jfxStartPulse{0%,100%{box-shadow:0 0 18px 4px rgba(255,45,45,.32)}50%{box-shadow:0 0 48px 14px rgba(255,85,85,.82)}}
@@ -977,6 +978,35 @@ async function jfxClose(id){
   .jfx-auth-hot:active{transform:translate(-50%,-50%) scale(.95)}
   .jfx-auth-hot.signup:hover{box-shadow:0 0 30px 7px rgba(255,60,60,.45)}
   .jfx-auth-hot.login:hover{box-shadow:0 0 30px 7px rgba(60,255,120,.45)}
+  /* Mobile portrait: assets are 16:9, so use COVER. This matches phone screens: central SKYTRADE panel fills the screen and side art is cropped. */
+  @media (max-aspect-ratio: 3/4){
+    .jfx-pre-stage,.jfx-auth-stage,.jfx-conn-stage,.jfx-home-stage,.jfx-end-stage{width:100vw!important;height:100dvh!important;min-height:100vh;aspect-ratio:auto!important;background-size:cover!important;background-position:center center!important}
+    #jfxIntro video{width:100vw;height:100dvh;min-height:100vh;object-fit:cover}
+    .jfx-pre-glow{width:7.5%;top:43.5%}
+    .jfx-pre-hint{bottom:5.8%;font-size:clamp(11px,3.2vw,15px);letter-spacing:.16em}
+
+    /* bg-auth.jpg calibrated from the real 1280x720 artwork */
+    .jfx-auth-hot{left:50%;width:78%;height:15.8%}
+    .jfx-auth-hot.signup{top:50.5%}
+    .jfx-auth-hot.login{top:72.5%}
+
+    /* bg-connect.png calibrated from the real 1280x720 artwork */
+    .jfx-conn-input{left:56%;width:53%;height:4.9%;font-size:clamp(11px,3.3vw,17px);padding:0 2.7%;text-align:left}
+    .jfx-conn-input.cn-id{top:49.5%}
+    .jfx-conn-input.cn-pass{top:57.3%}
+    .jfx-conn-input.cn-server{top:65.4%}
+    .jfx-conn-input.cn-license{top:73.2%;text-align:left;letter-spacing:.5px}
+    #jfxConnect #cnStatus{top:79.4%;width:86%;font-size:clamp(10px,3vw,14px)}
+    .jfx-conn-hot.connect{left:50%;top:88.8%;width:60%;height:12.2%}
+    .jfx-conn-hot.back{left:50%;top:96.5%;width:42%;height:5.8%}
+    .jfx-mini-link{top:82.4%;font-size:clamp(10px,3vw,14px);width:90%;text-align:center}
+
+    /* bg-home.png approximate controls */
+    .jfx-home-val{font-size:clamp(10px,3vw,14px)}
+    .jfx-home-val.bal{left:42%;top:42.5%}.jfx-home-val.eq{left:58%;top:42.5%}
+    .jfx-home-risk.r1{left:32%;top:50.2%;width:12%;height:5%}.jfx-home-risk.r2{left:44%;top:50.2%;width:12%;height:5%}.jfx-home-risk.r3{left:56%;top:50.2%;width:12%;height:5%}.jfx-home-risk.r4{left:68%;top:50.2%;width:12%;height:5%}
+    .jfx-home-hot.start{left:50%;top:60%;width:52%;height:11%}.jfx-home-hot.logout{left:50%;top:70%;width:32%;height:7%}
+  }
   .jfx-card{width:100%;max-width:430px;background:rgba(15,20,35,.55);border:1px solid rgba(124,180,255,.18);border-radius:20px;padding:26px 22px;backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);box-shadow:0 20px 60px rgba(0,0,0,.5)}
   .jfx-card .logo{font-size:12px;font-weight:800;letter-spacing:2px;color:#9fd0ff;text-transform:uppercase;margin-bottom:14px;overflow-wrap:anywhere}
   .jfx-card h2{overflow-wrap:anywhere}
@@ -1063,7 +1093,7 @@ async function jfxClose(id){
     <div class="jfx-pre-stage">
       <div class="jfx-pre-glow"></div>
     </div>
-    <div class="jfx-pre-hint">TEKAN TOMBOL UNTUK MULAI</div>
+    <div class="jfx-pre-hint">PRESS BUTTON TO START</div>
   </div>
 </div>
 
@@ -1504,12 +1534,17 @@ async function jfxClose(id){
     function finish(){ if(done) return; done=true; if(safety) clearTimeout(safety); bootRoute(); ov.classList.add('hide'); setTimeout(function(){ ov.style.display='none'; },650); }
     function start(){
       if(started||done) return; started=true;
-      if(tap) tap.classList.add('hide');
       if(!vid){ finish(); return; }
       try{ vid.muted=false; vid.currentTime=0; }catch(e){}
+      function showVideo(){
+        try{ vid.classList.add('jfx-video-on'); }catch(e){}
+        if(tap) tap.classList.add('hide');
+      }
+      vid.addEventListener('playing', showVideo, {once:true});
+      vid.addEventListener('timeupdate', function(){ if(vid.currentTime>0.15) showVideo(); }, {once:true});
       var p=vid.play&&vid.play();
       if(p&&p.catch) p.catch(function(){ finish(); });
-      safety=setTimeout(function(){ if(!done && (vid.error || vid.readyState<2)) finish(); },6000);
+      safety=setTimeout(function(){ if(!done && (vid.error || vid.readyState<2 || vid.currentTime<0.1)) finish(); },6500);
     }
     if(vid){ vid.addEventListener('ended',finish); vid.addEventListener('error',function(){ if(started) finish(); }); }
     if(tap){ tap.addEventListener('click',start); } else { start(); }
