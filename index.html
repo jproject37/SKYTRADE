@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v29</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v30</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -864,7 +864,7 @@ async function jfxClose(id){
   .jfx-home-hot.start.locked{cursor:not-allowed}
   .jfx-home-hot.logout{left:49.6%;top:80.5%;width:11%;height:5%}
   .jfx-home-hot:active{transform:translate(-50%,-50%) scale(.96)}
-  .jfx-home-status{position:absolute;left:49.7%;top:91%;transform:translate(-50%,-50%);width:20%;height:5.5%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9fe9c0;font-size:clamp(8px,2vw,14px);font-weight:600;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
+  .jfx-home-status{position:absolute;left:49.7%;top:87.3%;transform:translate(-50%,-50%);width:24%;height:5.2%;display:flex;align-items:center;justify-content:center;text-align:center;color:#aef5cf;font-size:clamp(12px,2.5vw,20px);font-weight:700;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
   .jfx-hero{width:100%;max-width:600px;border-radius:20px;display:block;margin:0 auto 20px;
     box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 60px rgba(34,211,238,.12)}
   .jfx-home-inner{width:100%;display:flex;flex-direction:column;align-items:center;padding:0}
@@ -958,6 +958,13 @@ async function jfxClose(id){
   .jfx-signup-card input:focus{border-color:#39ff8a;box-shadow:0 0 0 3px rgba(57,255,138,.12)}
   .jfx-signup-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
   .jfx-signup-actions button{border:0;border-radius:11px;padding:12px;font-weight:800;cursor:pointer}
+  #jfxIbModal{position:fixed;inset:0;z-index:12050;display:none;align-items:center;justify-content:center;background:rgba(2,6,18,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:18px;box-sizing:border-box}
+  #jfxIbModal.show{display:flex}
+  .jfx-ib-code{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 4px;padding:14px 16px;border-radius:12px;border:1px solid rgba(57,255,138,.35);background:#07111f}
+  .jfx-ib-code b{font-size:26px;letter-spacing:3px;color:#39ff8a;font-family:'Courier New',monospace}
+  .jfx-ib-copy{border:0;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;background:#39ff8a;color:#04210f}
+  .jfx-ib-go{width:100%;border:0;border-radius:11px;padding:13px;font-weight:800;cursor:pointer;background:linear-gradient(90deg,#39ff8a,#16c46a);color:#04210f;margin-top:12px;font-size:15px}
+  .jfx-ib-close{width:100%;border:1px solid rgba(154,219,183,.3);border-radius:11px;padding:11px;font-weight:700;cursor:pointer;background:transparent;color:#9adbb7;margin-top:8px}
   #sgSubmit{background:linear-gradient(135deg,#39ff8a,#12c971);color:#03140a}
   #sgClose{background:rgba(255,255,255,.08);color:#eafff2;border:1px solid rgba(255,255,255,.14)}
   #sgMsg{min-height:18px;margin-top:10px;font-size:13px;color:#aefad0;line-height:1.4}
@@ -984,7 +991,7 @@ async function jfxClose(id){
     #jfxConnect #cnStatus{font-size:clamp(10px,3vw,14px);width:82%}
     .jfx-mini-link{font-size:clamp(10px,3vw,14px);width:90%;text-align:center}
     .jfx-home-val{font-size:clamp(10px,3vw,14px)}
-    .jfx-home-status{font-size:clamp(9px,2.6vw,13px)}
+    .jfx-home-status{font-size:clamp(12px,3.2vw,18px)}
   }
   /* Wide / landscape screens (desktop): assets are 16:9, so CONTAIN to show the FULL artwork (no top/bottom cropping). Side bars are dark. Phones (portrait) keep COVER above. */
   @media (min-aspect-ratio: 16/9){
@@ -1105,7 +1112,7 @@ async function jfxClose(id){
 <!-- LAYAR SIGN IN / SIGN UP -->
 <div id="jfxAuth">
   <div class="jfx-auth-stage">
-    <a class="jfx-auth-hot signup" href="https://secure.tradingpro.com/links/go/8118" target="_blank" rel="noopener" aria-label="Sign Up"></a>
+    <a class="jfx-auth-hot signup" id="jfxSignupBtn" href="https://secure.tradingpro.com/links/go/8118" target="_blank" rel="noopener" aria-label="Sign Up"></a>
     <div class="jfx-auth-hot login" id="jfxToConnect" role="button" tabindex="0" aria-label="Login"></div>
   </div>
 </div>
@@ -1136,6 +1143,18 @@ async function jfxClose(id){
       <button id="sgClose" type="button">Close</button>
     </div>
     <div id="sgMsg"></div>
+  </div>
+</div>
+
+<!-- MODAL KODE IB (cegat sebelum daftar TradingPRO) -->
+<div id="jfxIbModal" aria-hidden="true">
+  <div class="jfx-signup-card">
+    <h3>Activate Your Rebate</h3>
+    <p>When TradingPRO asks for an <b>IB code</b> while creating your trading account, paste the code below. It is marked “optional”, but it must be filled in to activate your rebate benefits.</p>
+    <div class="jfx-ib-code"><b id="jfxIbCode">46077</b><button class="jfx-ib-copy" id="jfxIbCopy" type="button">Copy</button></div>
+    <div id="jfxIbMsg" style="font-size:12px;color:#9adbb7;min-height:14px;margin-top:2px"></div>
+    <button class="jfx-ib-go" id="jfxIbGo" type="button">Continue to TradingPRO →</button>
+    <button class="jfx-ib-close" id="jfxIbCloseBtn" type="button">Cancel</button>
   </div>
 </div>
 
@@ -1323,14 +1342,17 @@ async function jfxClose(id){
       .then(function(r){ return r.json().then(function(j){ return {r:r,j:j}; }); })
       .then(function(o){
         if(o.r.status===409 && o.j && /kill/i.test(o.j.error||'')){
-          if(homeStatus) homeStatus.innerHTML='System is starting….';
-          return fetch(BE+"/auto/reset",{method:"POST",headers:{"x-api-key":KEY}}).then(function(){ return fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}}); }).then(function(r2){ return r2.json(); });
+          if(homeStatus) homeStatus.innerHTML='Releasing kill-switch….';
+          return fetch(BE+"/auto/reset",{method:"POST",headers:{"x-api-key":KEY}}).then(function(){ return fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}}); }).then(function(r2){ return r2.json().then(function(j2){ return {r:r2,j:j2}; }); });
         }
-        if(o.j && o.j.ok===false && o.j.error){ throw new Error(o.j.error); }
-        return o.j;
+        return o;
       })
-      .then(function(){ warmThenUI4(0); })
-      .catch(function(e){ if(homeStatus) homeStatus.innerHTML='System is starting….'; });
+      .then(function(o){
+        var j=(o&&o.j)||o;
+        if(j && j.ok===false){ if(homeStatus) homeStatus.innerHTML=(j.error||'Cannot start engine'); return; }
+        warmThenUI4(0);
+      })
+      .catch(function(e){ if(homeStatus) homeStatus.innerHTML='Connection error — please try again'; });
   }
   function warmThenUI4(tries){
     var MAX=8;
@@ -1432,6 +1454,26 @@ async function jfxClose(id){
         .catch(function(e){ msg.textContent='Request failed: '+((e&&e.message)||'network'); })
         .finally(function(){ submit.disabled=false; });
     };
+  })();
+  (function wireIbModal(){
+    var IB_CODE='46077', IB_LINK='https://secure.tradingpro.com/links/go/8118';
+    var btn=document.getElementById('jfxSignupBtn'), modal=document.getElementById('jfxIbModal'),
+        copy=document.getElementById('jfxIbCopy'), go=document.getElementById('jfxIbGo'),
+        closeBtn=document.getElementById('jfxIbCloseBtn'), msg=document.getElementById('jfxIbMsg'),
+        codeEl=document.getElementById('jfxIbCode');
+    if(codeEl) codeEl.textContent=IB_CODE;
+    function show(){ if(modal){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); } }
+    function hide(){ if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); } }
+    if(btn) btn.addEventListener('click', function(e){ e.preventDefault(); show(); });
+    if(copy) copy.onclick=function(){
+      function done(){ if(msg) msg.textContent='IB code copied — paste it on the TradingPRO IB field.'; }
+      function fallback(){ try{ var t=document.createElement('textarea'); t.value=IB_CODE; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); done(); }catch(_){ if(msg) msg.textContent='Copy manually: '+IB_CODE; } }
+      try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(IB_CODE).then(done, fallback); } else { fallback(); } }
+      catch(e){ fallback(); }
+    };
+    if(go) go.onclick=function(){ window.open(IB_LINK,'_blank','noopener'); hide(); };
+    if(closeBtn) closeBtn.onclick=hide;
+    if(modal) modal.addEventListener('click', function(e){ if(e.target===modal) hide(); });
   })();
   document.getElementById('cnSubmit').onclick=connectAccount;
   function fmtNum(v){ return (v==null||isNaN(v))?'-':Number(v).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}); }
