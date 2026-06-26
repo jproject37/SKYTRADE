@@ -1495,7 +1495,7 @@ async function jfxClose(id){
     cnStatus.innerHTML='<span class="jfx-pill on">🟢 Connected to MetaApi</span>'
       +' &nbsp;\u2713 entering app...';
     try{ localStorage.setItem('jfx_acc_info', JSON.stringify({login:a.login,broker:a.broker,server:a.server,balance:a.balance,equity:a.equity,currency:a.currency})); }catch(e){}
-    setTimeout(function(){ showHome(); }, 1300);
+    setTimeout(function(){ bootRoute(); }, 1300); // routing pintar: engine LIVE -> UI4, selainnya -> home (UI3)
   }
   function tryAgainCountdown(n){
     if(n<=0){ connectAccount(); return; }
