@@ -626,12 +626,11 @@ document.getElementById("sendBtn").onclick=sendToBackend;
 function sendToBackend(){
   if(!lastR){alert("Generate sinyal dulu sebelum mengirim.");return;}
   var url="https://jfx-backend-production.up.railway.app/signal";
-  var key="sky_44a89227c3a7dbc0c110dfd0b76ce0a33ef293335bccff9d";
   var R=lastR;
   var rr=Math.abs(R.entry-R.sl)>0?+(Math.abs(R.tp2-R.entry)/Math.abs(R.entry-R.sl)).toFixed(2):null;
   var payload={pair:R.cfg.sym,verdict:R.action,confidence:R.confidence,entry:R.entry,sl:R.sl,tp1:R.tp1,tp2:R.tp2,lot:R.lots,rr:rr,riskPct:R.riskPct,capital:R.capital,live:!!R.data.live,ts:new Date().toISOString()};
   var b=document.getElementById("sendBtn");var old="📡 Kirim ke Backend";b.textContent="⏳ Mengirim...";b.disabled=true;
-  fetch(url,{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key},body:JSON.stringify(payload)})
+  fetch(url,{method:"POST",headers:jfxAuthH({"Content-Type":"application/json"}),body:JSON.stringify(payload)})
     .then(function(r){return r.json().catch(function(){return {};}).then(function(j){return {ok:r.ok,j:j};});})
     .then(function(res){ b.textContent=res.ok?("✓ Terkirim #"+(res.j.id||"")):("✗ Gagal: "+(res.j.error||"cek URL/Key")); })
     .catch(function(){ b.textContent="✗ Error jaringan/CORS"; })
@@ -798,7 +797,11 @@ padding:5px 10px;cursor:pointer;font-size:12px}
 
 <script>
 const JFX_BACKEND = 'https://jfx-backend-production.up.railway.app';
-const JFX_KEY = 'sky_44a89227c3a7dbc0c110dfd0b76ce0a33ef293335bccff9d';
+// Token per-user (berbasis lisensi) menggantikan API key global di HTML.
+function jfxGetTok(){ try{ return localStorage.getItem('jfx_token')||''; }catch(e){ return ''; } }
+function jfxSetTok(t){ try{ if(t) localStorage.setItem('jfx_token', t); }catch(e){} }
+function jfxClearTok(){ try{ localStorage.removeItem('jfx_token'); }catch(e){} }
+function jfxAuthH(extra){ var h = extra ? Object.assign({}, extra) : {}; var t = jfxGetTok(); if(t) h['x-user-token'] = t; return h; }
 function jfxToggle(open){
   document.getElementById('jfx-panel').classList.toggle('open', open);
   document.getElementById('jfx-fab').style.display = open ? 'none' : 'flex';
@@ -808,7 +811,7 @@ async function jfxRefreshPos(){
   const box = document.getElementById('jfx-pos');
   box.innerHTML = '<div class="jfx-empty">Loading…</div>';
   try{
-    const r = await fetch(JFX_BACKEND + '/positions',{headers:{'x-api-key':JFX_KEY}});
+    const r = await fetch(JFX_BACKEND + '/positions',{headers:jfxAuthH()});
     const d = await r.json();
     if(!d.ok) throw new Error(d.error);
     if(!d.count){ box.innerHTML = '<div class="jfx-empty">No open positions.</div>'; return; }
@@ -829,7 +832,7 @@ async function jfxClose(id){
   try{
     const r = await fetch(JFX_BACKEND + '/order/close',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':JFX_KEY},
+      headers:jfxAuthH({'Content-Type':'application/json'}),
       body:JSON.stringify({positionId:id})
     });
     const d = await r.json();
@@ -1218,7 +1221,7 @@ async function jfxClose(id){
 (function(){
   // ⬇️ Backend kamu (kalau URL/key berubah, ganti di 2 baris ini saja)
   var BE  = "https://jfx-backend-production.up.railway.app";
-  var KEY = "sky_44a89227c3a7dbc0c110dfd0b76ce0a33ef293335bccff9d";
+  // (Kunci global dihapus dari file ini — sekarang pakai token per-user via jfxAuthH().)
   // MOBILE production: /connect always requires a valid license key.
   // IMPORTANT: replace this with your admin WhatsApp number in international format, without + or spaces.
   // Example: "6281234567890"
@@ -1245,7 +1248,7 @@ async function jfxClose(id){
     if(!st||!bal||!eq) return;
     if(!id){ st.textContent='not connected'; bal.textContent='–'; eq.textContent='–'; return; }
     st.textContent='loading…';
-    fetch(BE+'/connect/status?accountId='+encodeURIComponent(id),{headers:{'x-api-key':KEY}})
+    fetch(BE+'/connect/status?accountId='+encodeURIComponent(id),{headers:jfxAuthH()})
       .then(function(r){ return r.json().catch(function(){return null;}); })
       .then(function(j){
         if(j && j.account){ var a=j.account; bal.textContent=fmtEq(a.balance)+' '+(a.currency||''); eq.textContent=fmtEq(a.equity)+' '+(a.currency||''); st.textContent=(j.status==='connected')?'🟢 live':('⏳ '+(j.status||'connecting')); }
@@ -1332,18 +1335,18 @@ async function jfxClose(id){
     var kode=''; try{ kode=localStorage.getItem(LIC_KEY)||''; }catch(e){}
     if(!kode){ showAuthScreen(); return; }
     cekLisensi(kode).then(continueRoute).catch(function(){
-      try{ localStorage.removeItem('jfx_account'); localStorage.removeItem(LIC_KEY); }catch(e){}
+      try{ localStorage.removeItem('jfx_account'); localStorage.removeItem(LIC_KEY); jfxClearTok(); }catch(e){}
       showAuthScreen();
     });
   }
   function _enableThenWarm(){
     if(homeStatus) homeStatus.innerHTML='System is starting….';
-    fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}})
+    fetch(BE+"/auto/enable",{method:"POST",headers:jfxAuthH()})
       .then(function(r){ return r.json().then(function(j){ return {r:r,j:j}; }); })
       .then(function(o){
         if(o.r.status===409 && o.j && /kill/i.test(o.j.error||'')){
           if(homeStatus) homeStatus.innerHTML='Releasing kill-switch….';
-          return fetch(BE+"/auto/reset",{method:"POST",headers:{"x-api-key":KEY}}).then(function(){ return fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}}); }).then(function(r2){ return r2.json().then(function(j2){ return {r:r2,j:j2}; }); });
+          return fetch(BE+"/auto/reset",{method:"POST",headers:jfxAuthH()}).then(function(){ return fetch(BE+"/auto/enable",{method:"POST",headers:jfxAuthH()}); }).then(function(r2){ return r2.json().then(function(j2){ return {r:r2,j:j2}; }); });
         }
         return o;
       })
@@ -1357,7 +1360,7 @@ async function jfxClose(id){
   function warmThenUI4(tries){
     var MAX=8;
     if(homeStatus) homeStatus.innerHTML='System is starting….';
-    fetch(BE+'/monitor',{headers:{'x-api-key':KEY}}).then(function(r){return r.json();})
+    fetch(BE+'/monitor',{headers:jfxAuthH()}).then(function(r){return r.json();})
       .then(function(j){
         if(j && j.connected){ if(homeStatus) homeStatus.innerHTML='System is starting….'; setTimeout(showUI4,500); return; }
         if(tries>=MAX){ if(homeStatus) homeStatus.innerHTML='System is starting….'; setTimeout(showUI4,500); return; }
@@ -1383,7 +1386,7 @@ async function jfxClose(id){
     localStorage.setItem(RISK_KEY,String(d));
     highlightRisk(d); lockModes(false);
     if(homeStatus) homeStatus.innerHTML='Simpan risk '+d+'%...';
-    fetch(BE+"/auto/risk-config",{method:"POST",headers:{"x-api-key":KEY,"Content-Type":"application/json"},body:JSON.stringify({dailyLossPct:d})})
+    fetch(BE+"/auto/risk-config",{method:"POST",headers:jfxAuthH({"Content-Type":"application/json"}),body:JSON.stringify({dailyLossPct:d})})
       .then(function(r){ return r.json().then(function(j){ return {r:r,j:j}; }); })
       .then(function(o){ if(!o.r.ok||!o.j||o.j.ok===false){ throw new Error((o.j&&o.j.error)||("HTTP "+o.r.status)); }
         var bd=(o.j.risk&&o.j.risk.dailyLossPct!=null)?o.j.risk.dailyLossPct:d;
@@ -1397,7 +1400,7 @@ async function jfxClose(id){
   function guard(fn){ return function(){ if(!localStorage.getItem(RISK_KEY)){ alert("Set your daily risk limit before choosing a trading mode."); return; } fn(); }; }
   function startEngine(){ _enableThenWarm(); return; /* flow lama (showAuto) dimatikan, diganti UI4 */
     if(homeStatus) homeStatus.innerHTML='Activating autotrade...';
-    fetch(BE+"/auto/enable",{method:"POST",headers:{"x-api-key":KEY}}).then(function(r){return r.json();})
+    fetch(BE+"/auto/enable",{method:"POST",headers:jfxAuthH()}).then(function(r){return r.json();})
       .then(function(j){ if(homeStatus) homeStatus.innerHTML='Autotrade ACTIVE \u2713 robot starting analysis'; })
       .catch(function(){ if(homeStatus) homeStatus.innerHTML='Engine ON (enable failed, check connection)'; })
       .finally(function(){ setTimeout(function(){ showAuto(); }, 700); }); }
@@ -1405,8 +1408,8 @@ async function jfxClose(id){
   menuBtn.onclick=showHome;
   document.getElementById('jfxAutoBack').onclick=showHome;
   function logout(){
-    try{ fetch(BE+'/session/stop',{method:'POST',headers:{'x-api-key':KEY},keepalive:true}); }catch(e){}
-    try{ localStorage.removeItem('jfx_account'); localStorage.removeItem('jfx_mt_pending'); localStorage.removeItem(RISK_KEY); localStorage.removeItem(LIC_KEY); }catch(e){}
+    try{ fetch(BE+'/session/stop',{method:'POST',headers:jfxAuthH(),keepalive:true}); }catch(e){}
+    try{ localStorage.removeItem('jfx_account'); localStorage.removeItem('jfx_mt_pending'); localStorage.removeItem(RISK_KEY); localStorage.removeItem(LIC_KEY); jfxClearTok(); }catch(e){}
     var l=document.getElementById('cnLogin'),p=document.getElementById('cnPass'),s=document.getElementById('cnServer'),lic=document.getElementById('cnLicense'),st=document.getElementById('cnStatus');
     if(l)l.value=''; if(p)p.value=''; if(s)s.value=''; if(lic)lic.value='';
     if(st)st.innerHTML='';
@@ -1494,7 +1497,7 @@ async function jfxClose(id){
     if(tries>MAX){ cnStatus.innerHTML='<span class="jfx-pill off">❌ Connection failed. Check your ID, password & server. The account could not come online.</span>'; return; }
     var secs=tries*4;
     cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Connecting to your MT account... ('+secs+'s)</span><div class="jfx-note">A new account needs ~1-3 min to come online the first time. Please wait, do not close it.</div>';
-    fetch(BE+'/connect/status?accountId='+encodeURIComponent(accountId),{headers:{'x-api-key':KEY}})
+    fetch(BE+'/connect/status?accountId='+encodeURIComponent(accountId),{headers:jfxAuthH()})
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(j){
         if(j && j.status==='connected' && j.account){ showBalance(j.account, accountId); return; }
@@ -1515,11 +1518,12 @@ async function jfxClose(id){
     return msg;
   }
   function cekLisensi(kode){
-    return fetch(BE+'/lisensi/cek',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kode:kode})})
+    return fetch(BE+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kode:kode})})
       .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
       .then(function(o){
         if(!o.ok || !o.j) throw new Error('Failed to check license (HTTP '+o.status+')');
         if(!o.j.valid) throw new Error(translateLicenseError(o.j.reason || o.j.error) || 'Invalid access code');
+        if(o.j.token) jfxSetTok(o.j.token);
         try{ localStorage.setItem(LIC_KEY,kode); }catch(e){}
         return o.j;
       });
@@ -1538,7 +1542,7 @@ async function jfxClose(id){
       cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Registering account to MetaApi...</span>';
       var payload={login:lg,password:pw,server:sv,platform:'mt4'};
       payload.kodeLisensi=kode;
-      return fetch(BE+'/connect',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':KEY},body:JSON.stringify(payload)});
+      return fetch(BE+'/connect',{method:'POST',headers:jfxAuthH({'Content-Type':'application/json'}),body:JSON.stringify(payload)});
     })
       .then(function(r){ return r.text().then(function(t){ var j=null; try{ j=JSON.parse(t); }catch(e){} return {ok:r.ok,status:r.status,j:j,raw:t}; }); })
       .then(function(res){
@@ -1582,7 +1586,7 @@ async function jfxClose(id){
   })();
 
   function api(path,method){
-    return fetch(BE+path,{method:method||'GET',headers:{'x-api-key':KEY}}).then(function(r){return r.json();});
+    return fetch(BE+path,{method:method||'GET',headers:jfxAuthH()}).then(function(r){return r.json();});
   }
   function setUI(a){
 var box=document.getElementById('jfxStatusBox'),
