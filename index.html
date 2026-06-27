@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v31</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v33</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -1088,6 +1088,11 @@ async function jfxClose(id){
   .jfx-end-fx.live .es-fx-scan .beam{background:linear-gradient(90deg,transparent,rgba(59,130,246,.6) 70%,rgba(200,225,255,.98));box-shadow:0 0 16px 4px rgba(59,130,246,.6)}
   .jfx-end-fx.live .es-fx-label{color:#8fbcff;text-shadow:0 0 9px rgba(59,130,246,.75);animation:esglowblue 1.8s ease-in-out infinite}
   @keyframes esglowblue{0%,100%{opacity:.72;text-shadow:0 0 5px rgba(59,130,246,.4)}50%{opacity:1;text-shadow:0 0 14px rgba(80,160,255,.98)}}
+  /* animasi status 'System is starting' biar hidup: teks denyut + titik berurutan */
+  @keyframes jfxLoadPulse{0%,100%{opacity:.5;text-shadow:0 0 4px rgba(22,255,163,.25)}50%{opacity:1;text-shadow:0 0 12px rgba(22,255,163,.85)}}
+  @keyframes jfxLoadDots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
+  .jfx-load{display:inline-block;animation:jfxLoadPulse 1.3s ease-in-out infinite}
+  .jfx-load::after{content:'';display:inline-block;width:1.3em;text-align:left;animation:jfxLoadDots 1.4s steps(1,end) infinite}
 </style>
 
 <!-- LAYAR INTRO: video pembuka (tap-to-start biar suara nyala). Timpa file intro.mp4 (folder sama) untuk ganti. -->
@@ -1330,12 +1335,56 @@ async function jfxClose(id){
     if(k) k.onclick=function(){ ui4Act('/auto/kill', 'Confirm KILL-SWITCH? Engine off, locked & all pending orders cancelled.', showHome); };
     if(r) r.onclick=function(){ ui4Act('/auto/reset', null, null); };
   })();
+  // ===== BANNER: aktifkan notif Telegram per-user (muncul di dashboard kalau belum link) =====
+  var _tgBannerPoll=null;
+  function _tgBannerEl(){ return document.getElementById('jfxTgBanner'); }
+  function removeTgBanner(){ if(_tgBannerPoll){ clearInterval(_tgBannerPoll); _tgBannerPoll=null; } var e=_tgBannerEl(); if(e&&e.parentNode) e.parentNode.removeChild(e); }
+  function initTgBanner(){
+    fetch(BE+'/me/tg-link',{headers:jfxAuthH()})
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(j){
+        if(!j || !j.ok) return;
+        if(j.linked){ removeTgBanner(); return; }
+        if(!j.link) return;
+        showTgBanner(j.link);
+      }).catch(function(){});
+  }
+  function showTgBanner(link){
+    if(_tgBannerEl()) return;
+    var b=document.createElement('div');
+    b.id='jfxTgBanner';
+    b.style.cssText='position:fixed;left:10px;right:10px;bottom:12px;z-index:2147483000;max-width:520px;margin:0 auto;background:#11161f;border:1px solid #2a3342;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.45);font-family:inherit';
+    b.innerHTML=
+      '<div style="font-size:22px;line-height:1">🔔</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;font-weight:800;color:#fff">Aktifkan notif Telegram</div>'+
+        '<div style="font-size:11px;color:#9aa3b2;line-height:1.4">Biar update trading masuk ke HP kamu</div>'+
+      '</div>'+
+      '<button id="jfxTgGo" style="flex:none;background:#229ed9;color:#fff;border:none;border-radius:9px;padding:9px 13px;font-weight:700;font-size:12px;cursor:pointer">Aktifkan</button>'+
+      '<button id="jfxTgX" style="flex:none;background:transparent;color:#8a93a3;border:none;font-size:18px;cursor:pointer;padding:2px 4px;line-height:1">×</button>';
+    document.body.appendChild(b);
+    document.getElementById('jfxTgGo').onclick=function(){ try{ window.open(link,'_blank'); }catch(e){ location.href=link; } if(_tgBannerPoll) clearInterval(_tgBannerPoll); _tgBannerPoll=setInterval(checkTgLinked,4000); };
+    document.getElementById('jfxTgX').onclick=function(){ removeTgBanner(); };
+  }
+  function checkTgLinked(){
+    fetch(BE+'/me/tg-link',{headers:jfxAuthH()})
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(j){
+        if(j && j.ok && j.linked){
+          var e=_tgBannerEl();
+          if(e){ e.innerHTML='<div style="font-size:22px">✅</div><div style="flex:1;font-size:13px;font-weight:700;color:#22ffa3">Telegram aktif</div>'; }
+          if(_tgBannerPoll){ clearInterval(_tgBannerPoll); _tgBannerPoll=null; }
+          setTimeout(removeTgBanner,3000);
+        }
+      }).catch(function(){});
+  }
   function bootRoute(){
     // GERBANG LOGIN: device ini WAJIB sudah login (punya sesi lokal) sebelum boleh lihat dashboard.
     // MOBILE juga wajib punya kode lisensi yang masih valid setiap mau masuk.
     var acc=''; try{ acc=localStorage.getItem('jfx_account')||''; }catch(e){}
     if(!acc){ showAuthScreen(); return; }
     var continueRoute=function(){
+      try{ initTgBanner(); }catch(e){}
       api('/auto/status').then(function(j){
         var a=j&&j.auto;
         if(a && a.enabled){ showUI4(); return; }
@@ -1350,7 +1399,7 @@ async function jfxClose(id){
     });
   }
   function _enableThenWarm(){
-    if(homeStatus) homeStatus.innerHTML='System is starting….';
+    if(homeStatus) homeStatus.innerHTML='<span class="jfx-load">System is starting</span>';
     fetch(BE+"/auto/enable",{method:"POST",headers:jfxAuthH()})
       .then(function(r){ return r.json().then(function(j){ return {r:r,j:j}; }); })
       .then(function(o){
@@ -1369,11 +1418,11 @@ async function jfxClose(id){
   }
   function warmThenUI4(tries){
     var MAX=8;
-    if(homeStatus) homeStatus.innerHTML='System is starting….';
+    if(homeStatus) homeStatus.innerHTML='<span class="jfx-load">System is starting</span>';
     fetch(BE+'/monitor',{headers:jfxAuthH()}).then(function(r){return r.json();})
       .then(function(j){
-        if(j && j.connected){ if(homeStatus) homeStatus.innerHTML='System is starting….'; setTimeout(showUI4,500); return; }
-        if(tries>=MAX){ if(homeStatus) homeStatus.innerHTML='System is starting….'; setTimeout(showUI4,500); return; }
+        if(j && j.connected){ if(homeStatus) homeStatus.innerHTML='<span class="jfx-load">System is starting</span>'; setTimeout(showUI4,500); return; }
+        if(tries>=MAX){ if(homeStatus) homeStatus.innerHTML='<span class="jfx-load">System is starting</span>'; setTimeout(showUI4,500); return; }
         setTimeout(function(){ warmThenUI4(tries+1); }, 4000);
       })
       .catch(function(){ if(tries>=MAX){ setTimeout(showUI4,300); } else setTimeout(function(){ warmThenUI4(tries+1); }, 4000); });
@@ -1401,7 +1450,7 @@ async function jfxClose(id){
       .then(function(o){ if(!o.r.ok||!o.j||o.j.ok===false){ throw new Error((o.j&&o.j.error)||("HTTP "+o.r.status)); }
         var bd=(o.j.risk&&o.j.risk.dailyLossPct!=null)?o.j.risk.dailyLossPct:d;
         localStorage.setItem(RISK_KEY,String(bd)); highlightRisk(parseInt(bd,10)); lockModes(false);
-        if(homeStatus) homeStatus.innerHTML='Risk '+bd+'% / wk '+weeklyPct(bd)+'% ✓'; })
+        if(homeStatus) homeStatus.innerHTML='Risk '+bd+'% / wk '+weeklyPct(bd)+'% ��'; })
       .catch(function(e){ lockModes(true);
         if(homeStatus) homeStatus.innerHTML='Failed to save risk, choose again'; });
   }
@@ -1566,10 +1615,8 @@ async function jfxClose(id){
       .then(function(res){
         // A2: akun RIIL sudah diizinkan admin tapi user belum konfirmasi sekali
         if(res.j && res.j.needLiveConfirm){ showLiveConfirm(function(){ sendConnect(true); }); return; }
-        // A1: akun RIIL belum diizinkan admin -> tampilkan status menunggu
-        if(res.j && res.j.livePending){
-          cnStatus.innerHTML='<span class="jfx-pill off">⏳ This is a REAL account. Your request has been sent to the admin for approval. You can connect once the admin allows it — please try again shortly.</span>'; return;
-        }
+        // A1: akun RIIL belum diizinkan admin -> tampilkan pop-up menunggu approval (auto-poll)
+        if(res.j && res.j.livePending){ showWaitingApproval(); return; }
         if(!res.ok || !res.j || !res.j.accountId){
           var msg;
           if(res.j&&res.j.error){ msg=res.j.error; }
@@ -1579,6 +1626,40 @@ async function jfxClose(id){
         pollStatus(res.j.accountId, 0);
       })
       .catch(function(err){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ '+((err&&err.message)||'Could not reach server')+'</span>'; });
+  }
+  // Pop-up "menunggu approval admin" (A1): persisten + auto-poll, ilang sendiri saat admin approve.
+  var _waitPoll=null;
+  function stopWaitApproval(){ if(_waitPoll){ clearInterval(_waitPoll); _waitPoll=null; } }
+  function closeWaitApproval(){ stopWaitApproval(); var o=document.getElementById('jfxWaitApproval'); if(o&&o.parentNode) o.parentNode.removeChild(o); }
+  function showWaitingApproval(){
+    closeWaitApproval();
+    var ov=document.createElement('div');
+    ov.id='jfxWaitApproval';
+    ov.style.cssText='position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);padding:22px;font-family:inherit';
+    ov.innerHTML=
+      '<div style="max-width:360px;width:100%;background:#11161f;border:1px solid #2a3342;border-radius:16px;padding:24px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)">'+
+        '<div style="font-size:36px;line-height:1;margin-bottom:12px">⏳</div>'+
+        '<div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:10px">Waiting for Admin Approval</div>'+
+        '<div style="font-size:13px;line-height:1.55;color:#c7d0dc;margin-bottom:8px">Your account is <b style="color:#ffd166">waiting for approval by admin</b> before it can trade on a real (live) account.</div>'+
+        '<div style="font-size:12px;line-height:1.5;color:#8a93a3;margin-bottom:18px">This window will close automatically once the admin approves. If it doesn\'t, you can tap CONNECT again after it closes.</div>'+
+        '<div style="display:flex;align-items:center;justify-content:center;gap:8px;color:#22ffa3;font-size:12px;font-weight:700"><span class="jfx-spin"></span> Checking approval…</div>'+
+        '<button id="jfxWaitCancel" style="margin-top:18px;width:100%;padding:11px;border:1px solid #2a3342;border-radius:10px;background:transparent;color:#8a93a3;font-weight:600;font-size:13px;cursor:pointer">Cancel</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    document.getElementById('jfxWaitCancel').onclick=function(){ closeWaitApproval(); cnStatus.innerHTML=''; };
+    if(_waitPoll) clearInterval(_waitPoll);
+    _waitPoll=setInterval(function(){
+      fetch(BE+'/connect/live-status',{headers:jfxAuthH()})
+        .then(function(r){ return r.json().catch(function(){return null;}); })
+        .then(function(j){
+          if(j && j.ok && j.live_allowed){
+            closeWaitApproval();
+            cnStatus.innerHTML='<span class="jfx-pill on">✅ Approved by admin — continue…</span>';
+            sendConnect(false); // backend -> needLiveConfirm -> pop-up "Real Money Account" -> UI
+          }
+        })
+        .catch(function(){});
+    }, 5000);
   }
   // Pop-up konfirmasi SEKALI untuk AKUN RIIL (A2). onYes dipanggil kalau user setuju.
   function showLiveConfirm(onYes){
