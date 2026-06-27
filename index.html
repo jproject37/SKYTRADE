@@ -1357,10 +1357,10 @@ async function jfxClose(id){
     b.innerHTML=
       '<div style="font-size:22px;line-height:1">🔔</div>'+
       '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:13px;font-weight:800;color:#fff">Aktifkan notif Telegram</div>'+
-        '<div style="font-size:11px;color:#9aa3b2;line-height:1.4">Biar update trading masuk ke HP kamu</div>'+
+        '<div style="font-size:13px;font-weight:800;color:#fff">Enable Telegram alerts</div>'+
+        '<div style="font-size:11px;color:#9aa3b2;line-height:1.4">Get your trading updates on your phone</div>'+
       '</div>'+
-      '<button id="jfxTgGo" style="flex:none;background:#229ed9;color:#fff;border:none;border-radius:9px;padding:9px 13px;font-weight:700;font-size:12px;cursor:pointer">Aktifkan</button>'+
+      '<button id="jfxTgGo" style="flex:none;background:#229ed9;color:#fff;border:none;border-radius:9px;padding:9px 13px;font-weight:700;font-size:12px;cursor:pointer">Enable</button>'+
       '<button id="jfxTgX" style="flex:none;background:transparent;color:#8a93a3;border:none;font-size:18px;cursor:pointer;padding:2px 4px;line-height:1">×</button>';
     document.body.appendChild(b);
     document.getElementById('jfxTgGo').onclick=function(){ try{ window.open(link,'_blank'); }catch(e){ location.href=link; } if(_tgBannerPoll) clearInterval(_tgBannerPoll); _tgBannerPoll=setInterval(checkTgLinked,4000); };
@@ -1372,7 +1372,7 @@ async function jfxClose(id){
       .then(function(j){
         if(j && j.ok && j.linked){
           var e=_tgBannerEl();
-          if(e){ e.innerHTML='<div style="font-size:22px">✅</div><div style="flex:1;font-size:13px;font-weight:700;color:#22ffa3">Telegram aktif</div>'; }
+          if(e){ e.innerHTML='<div style="font-size:22px">✅</div><div style="flex:1;font-size:13px;font-weight:700;color:#22ffa3">Telegram connected</div>'; }
           if(_tgBannerPoll){ clearInterval(_tgBannerPoll); _tgBannerPoll=null; }
           setTimeout(removeTgBanner,3000);
         }
