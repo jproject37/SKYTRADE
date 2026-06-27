@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v30</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v31</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -1547,15 +1547,29 @@ async function jfxClose(id){
     if(!lg||!pw||!sv){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ Enter your ID, password & server first</span>'; return; }
     if(!kode){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ Enter your access / license key first</span>'; return; }
     cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Checking license...</span>';
-    var afterLicense = cekLisensi(kode);
-    afterLicense.then(function(){
-      cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Registering account to MetaApi...</span>';
-      var payload={login:lg,password:pw,server:sv,platform:'mt4'};
-      payload.kodeLisensi=kode;
-      return fetch(BE+'/connect',{method:'POST',headers:jfxAuthH({'Content-Type':'application/json'}),body:JSON.stringify(payload)});
-    })
+    cekLisensi(kode).then(function(){
+      sendConnect(false);
+    }).catch(function(err){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ '+((err&&err.message)||'Could not reach server')+'</span>'; });
+  }
+  // Kirim permintaan connect. confirmLive=true dipakai setelah user menyetujui pop-up akun riil (A2).
+  function sendConnect(confirmLive){
+    var lg=document.getElementById('cnLogin').value.trim(),
+        pw=document.getElementById('cnPass').value.trim(),
+        sv=(document.getElementById('cnServer').value||'').trim(),
+        licEl=document.getElementById('cnLicense'),
+        kode=normKode(licEl?licEl.value:localStorage.getItem(LIC_KEY));
+    cnStatus.innerHTML='<span class="jfx-pill on"><span class="jfx-spin"></span> Registering account to MetaApi...</span>';
+    var payload={login:lg,password:pw,server:sv,platform:'mt4',kodeLisensi:kode};
+    if(confirmLive) payload.confirmLive=true;
+    fetch(BE+'/connect',{method:'POST',headers:jfxAuthH({'Content-Type':'application/json'}),body:JSON.stringify(payload)})
       .then(function(r){ return r.text().then(function(t){ var j=null; try{ j=JSON.parse(t); }catch(e){} return {ok:r.ok,status:r.status,j:j,raw:t}; }); })
       .then(function(res){
+        // A2: akun RIIL sudah diizinkan admin tapi user belum konfirmasi sekali
+        if(res.j && res.j.needLiveConfirm){ showLiveConfirm(function(){ sendConnect(true); }); return; }
+        // A1: akun RIIL belum diizinkan admin -> tampilkan status menunggu
+        if(res.j && res.j.livePending){
+          cnStatus.innerHTML='<span class="jfx-pill off">⏳ This is a REAL account. Your request has been sent to the admin for approval. You can connect once the admin allows it — please try again shortly.</span>'; return;
+        }
         if(!res.ok || !res.j || !res.j.accountId){
           var msg;
           if(res.j&&res.j.error){ msg=res.j.error; }
@@ -1565,6 +1579,26 @@ async function jfxClose(id){
         pollStatus(res.j.accountId, 0);
       })
       .catch(function(err){ cnStatus.innerHTML='<span class="jfx-pill off">⚠️ '+((err&&err.message)||'Could not reach server')+'</span>'; });
+  }
+  // Pop-up konfirmasi SEKALI untuk AKUN RIIL (A2). onYes dipanggil kalau user setuju.
+  function showLiveConfirm(onYes){
+    var ov=document.getElementById('jfxLiveConfirm');
+    if(ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    ov=document.createElement('div');
+    ov.id='jfxLiveConfirm';
+    ov.style.cssText='position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:22px;font-family:inherit';
+    ov.innerHTML=
+      '<div style="max-width:360px;width:100%;background:#11161f;border:1px solid #2a3342;border-radius:16px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)">'+
+        '<div style="font-size:34px;line-height:1;margin-bottom:10px">⚠️</div>'+
+        '<div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px">Real Money Account</div>'+
+        '<div style="font-size:13px;line-height:1.5;color:#c7d0dc;margin-bottom:18px">This is a <b style="color:#ffd166">LIVE account</b>. The robot will trade automatically using <b style="color:#ffd166">REAL money</b> based on your risk settings. Losses are real. Do you want to continue?</div>'+
+        '<button id="jfxLiveYes" style="width:100%;padding:13px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:10px">Yes, trade with real money</button>'+
+        '<button id="jfxLiveNo" style="width:100%;padding:12px;border:1px solid #2a3342;border-radius:10px;background:transparent;color:#c7d0dc;font-weight:700;font-size:14px;cursor:pointer">Cancel</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+    document.getElementById('jfxLiveYes').onclick=function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); if(typeof onYes==='function') onYes(); };
+    document.getElementById('jfxLiveNo').onclick=function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); cnStatus.innerHTML='<span class="jfx-pill off">Cancelled. You can connect a demo account or try again.</span>'; };
+    ov.addEventListener('click',function(e){ if(e.target===ov){ if(ov.parentNode) ov.parentNode.removeChild(ov); cnStatus.innerHTML='<span class="jfx-pill off">Cancelled.</span>'; } });
   }
   var riskConfirm=document.getElementById('jfxRiskConfirm');
   if(riskConfirm) riskConfirm.onclick=function(){ if(!localStorage.getItem(RISK_KEY)){ alert('Choose your daily risk limit first.'); return; } riskModal.classList.remove('show'); };
