@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v38</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v40</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -1080,13 +1080,20 @@ async function jfxClose(id){
   .es-empty{font-size:clamp(12px,2.8vw,16px);color:#7fae97;text-align:center;padding:.6vh 0}
   .es-note{font-size:clamp(6px,.66vw,11px);color:#7fae97;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .jfx-end-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:1vw;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
-  .jfx-end-hot.off{left:41.2%;top:82.3%;width:8%;height:6.8%}
-  .jfx-end-hot.kill{left:49.6%;top:82.3%;width:8%;height:6.8%}
-  .jfx-end-hot.reset{left:57.7%;top:82.3%;width:8%;height:6.8%}
+  .jfx-end-hot.off{left:28.5%;top:82%;width:19%;height:7.6%}
+  .jfx-end-hot.kill{left:50%;top:82%;width:19%;height:7.6%}
+  .jfx-end-hot.reset{left:71.5%;top:82%;width:19%;height:7.6%}
   .jfx-end-hot.off:hover{box-shadow:0 0 22px 5px rgba(130,150,180,.5)}
   .jfx-end-hot.kill:hover{box-shadow:0 0 24px 6px rgba(246,70,93,.55)}
   .jfx-end-hot.reset:hover{box-shadow:0 0 22px 5px rgba(240,185,11,.5)}
   .jfx-end-hot:active{transform:translate(-50%,-50%) scale(.95)}
+  /* ===== HOTSPOT DEBUG OVERLAY (opt-in: tap badge versi 4x, atau URL #hotdbg) ===== */
+  body.jfxHotDbg .jfx-home-hot,body.jfxHotDbg .jfx-home-risk,body.jfxHotDbg .jfx-conn-hot,body.jfxHotDbg .jfx-conn-input,body.jfxHotDbg .jfx-auth-hot,body.jfxHotDbg .jfx-end-hot{outline:2px dashed #ff2d95!important;background:rgba(255,45,149,.30)!important;box-shadow:0 0 0 1px rgba(255,255,255,.9) inset!important;z-index:2147483000!important}
+  body.jfxHotDbg .jfx-end-hot{outline-color:#00e5ff!important;background:rgba(0,229,255,.32)!important}
+  body.jfxHotDbg .jfx-auth-hot{outline-color:#ffd600!important;background:rgba(255,214,0,.30)!important}
+  body.jfxHotDbg .jfx-conn-hot{outline-color:#7CFC00!important;background:rgba(124,252,0,.30)!important}
+  body.jfxHotDbg .jfx-conn-input{outline-color:#00e5ff!important;background:rgba(0,229,255,.22)!important}
+  body.jfxHotDbg .jfx-home-risk{outline-color:#ffd600!important;background:rgba(255,214,0,.30)!important}
   /* status FX: equalizer/neon — hijau jalan saat analisa, merah diam saat off */
   .jfx-end-fx{position:absolute;left:49.7%;top:92%;transform:translate(-50%,-50%);width:25%;height:7%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5vh;pointer-events:none}
   .es-fx-scan{position:relative;width:100%;height:58%;overflow:hidden;border-radius:3px;background:repeating-linear-gradient(90deg,rgba(22,255,163,.14) 0 1px,transparent 1px 7%)}
@@ -1258,7 +1265,7 @@ async function jfxClose(id){
 (function(){
   // ⬇️ Backend kamu (kalau URL/key berubah, ganti di 2 baris ini saja)
   var BE  = "https://jfx-backend-production.up.railway.app";
-  // (Kunci global dihapus dari file ini — sekarang pakai token per-user via jfxAuthH().)
+  // (Kunci global dihapus dari file ini �� sekarang pakai token per-user via jfxAuthH().)
   // MOBILE production: /connect always requires a valid license key.
   // IMPORTANT: replace this with your admin WhatsApp number in international format, without + or spaces.
   // Example: "6281234567890"
@@ -1841,5 +1848,14 @@ if(a.since){ try{ s.textContent='Last changed: '+new Date(a.since).toLocaleStrin
   bootRoute(); // rute awal: engine ON -> UI4, sudah konek -> UI3, baru -> login
 })();
 </script>
+<script>(function(){try{
+  function has(){return document.body.classList.contains('jfxHotDbg');}
+  function set(on){document.body.classList.toggle('jfxHotDbg',!!on);try{localStorage.setItem('jfx_hotdbg',on?'1':'0');}catch(e){}}
+  var on=false;try{on=localStorage.getItem('jfx_hotdbg')==='1';}catch(e){}
+  if(/hotdbg/i.test(location.hash))on=true;
+  if(on)document.body.classList.add('jfxHotDbg');
+  var b=document.getElementById('jfxVerBadge'),n=0,t=0;
+  if(b)b.addEventListener('click',function(){var now=Date.now();if(now-t>900)n=0;t=now;n++;if(n>=4){n=0;set(!has());try{alert('Hotspot debug: '+(has()?'ON — outline nempel di gambar tombol = pas':'OFF'));}catch(e){}}});
+}catch(e){}})();</script>
 </body>
 </html>
