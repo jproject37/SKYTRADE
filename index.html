@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v40</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v41</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -1534,7 +1534,7 @@ async function jfxClose(id){
   function setMode(m){
     var target=(m==='highrisk')?'highrisk':'lowrisk';
     if(target==='highrisk'){
-      if(!confirm('MODE HIGH RISK\n\nRobot memakai strategi V1 di SEMUA pair. Potensi profit besar, TAPI risiko rugi juga besar. Trading forex berisiko tinggi \u2014 kamu bisa kehilangan dana dengan cepat.\n\nLanjut ke HIGH RISK?')){ return; }
+      if(!confirm('HIGH RISK MODE\n\nThe robot uses the V1 strategy on ALL pairs. The profit potential is large, BUT the risk of loss is also large. Forex trading is high-risk \u2014 you can lose your funds quickly. But the risk of loss is also large; the system gives you options to minimize bigger losses. Choose wisely.\n\nProceed to HIGH RISK?')){ return; }
     }
     paintMode(target); // optimistic
     fetch(BE+"/auto/mode",{method:"POST",headers:jfxAuthH({"Content-Type":"application/json"}),body:JSON.stringify({mode:target})})
