@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v35</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v37</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -868,6 +868,16 @@ async function jfxClose(id){
   .jfx-home-hot.logout{left:49.6%;top:80.5%;width:11%;height:5%}
   .jfx-home-hot:active{transform:translate(-50%,-50%) scale(.96)}
   .jfx-home-status{position:absolute;left:49.7%;top:87.3%;transform:translate(-50%,-50%);width:24%;height:5.2%;display:flex;align-items:center;justify-content:center;text-align:center;color:#aef5cf;font-size:clamp(12px,2.5vw,20px);font-weight:700;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
+  /* ===== MODE OTAK ROBOT (muncul HANYA setelah akun live-approved admin) ===== */
+  .jfx-mode-toggle{position:absolute;left:50%;top:56.1%;transform:translate(-50%,-50%);width:31%;box-sizing:border-box;background:rgba(6,10,20,.82);border:1px solid rgba(124,180,255,.28);border-radius:12px;padding:0.7% 0.9%;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 8px 26px rgba(0,0,0,.5);z-index:3}
+  .jfx-mode-toggle .mt-lbl{font-size:clamp(8px,1.05vw,12px);font-weight:800;letter-spacing:.06em;color:#cbd6ff;text-align:center;margin-bottom:4%}
+  .jfx-mode-pills{display:flex;gap:5%}
+  .jfx-mode-pill{flex:1;border:1px solid rgba(124,180,255,.22);background:#0b0f1a;color:#9aa3bd;font-weight:800;font-size:clamp(8px,1.15vw,13px);font-family:inherit;padding:6% 2%;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,filter .12s;white-space:nowrap;overflow:hidden;text-align:center}
+  .jfx-mode-pill:active{transform:scale(.95)}
+  .jfx-mode-pill.low.active{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border-color:transparent}
+  .jfx-mode-pill.high.active{background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;border-color:transparent}
+  .jfx-mode-desc{font-size:clamp(7px,.95vw,11px);line-height:1.35;color:#9aa3bd;text-align:center;margin-top:4%}
+  .jfx-mode-desc.warn{color:#ffb4a2}
   .jfx-hero{width:100%;max-width:600px;border-radius:20px;display:block;margin:0 auto 20px;
     box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 60px rgba(34,211,238,.12)}
   .jfx-home-inner{width:100%;display:flex;flex-direction:column;align-items:center;padding:0}
@@ -1122,6 +1132,14 @@ async function jfxClose(id){
     <div class="jfx-home-hot start locked" id="jfxBtnAuto" role="button" tabindex="0" aria-label="Start Engine"></div>
     <div class="jfx-home-hot logout" id="jfxLogout" role="button" tabindex="0" aria-label="Logout"></div>
     <div class="jfx-home-status" id="jfxHomeStatus"></div>
+    <div class="jfx-mode-toggle" id="jfxModeToggle" style="display:none">
+      <div class="mt-lbl">MODE OTAK ROBOT</div>
+      <div class="jfx-mode-pills">
+        <div class="jfx-mode-pill low active" id="jfxModeLow" role="button" tabindex="0" aria-label="Low Risk">🛡️ LOW RISK</div>
+        <div class="jfx-mode-pill high" id="jfxModeHigh" role="button" tabindex="0" aria-label="High Risk">🔥 HIGH RISK</div>
+      </div>
+      <div class="jfx-mode-desc" id="jfxModeDesc">Pertumbuhan stabil — strategi teruji per-pair.</div>
+    </div>
   </div>
 </div>
 
@@ -1253,7 +1271,8 @@ async function jfxClose(id){
   function showAuthScreen(){ hideScreens(); scAuth.style.display='flex'; }
   function showConnectScreen(){ hideScreens(); scConn.style.display='flex'; }
   function showHome(){ hideScreens(); home.style.display='flex';
-    try{ refreshEquity(); }catch(e){} }
+    try{ refreshEquity(); }catch(e){}
+    try{ refreshModeToggle(); }catch(e){} }
   function fmtEq(v){ if(v==null||isNaN(v)) return '–'; return Number(v).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function refreshEquity(){
     var id=''; try{ id=localStorage.getItem('jfx_account')||''; }catch(e){}
@@ -1457,6 +1476,54 @@ async function jfxClose(id){
   }
   for(var _ri=0;_ri<riskBtns.length;_ri++){ (function(btn){ btn.onclick=function(){ applyRisk(parseInt(btn.getAttribute('data-risk'),10)); }; })(riskBtns[_ri]); }
   (function initRisk(){ var s=localStorage.getItem(RISK_KEY); var d=s?parseInt(s,10):0; if(d){ highlightRisk(d); lockModes(false); } else { lockModes(true); } })();
+
+  // ===== MODE OTAK ROBOT: LOW (V2 per-pair) / HIGH (V1 semua pair). Muncul hanya utk akun live-approved. =====
+  var MODE_KEY="jfx_robot_mode";
+  var modeToggle=document.getElementById('jfxModeToggle'),
+      modeLowBtn=document.getElementById('jfxModeLow'),
+      modeHighBtn=document.getElementById('jfxModeHigh'),
+      modeDesc=document.getElementById('jfxModeDesc');
+  var MODE_TXT={
+    lowrisk:{d:'Pertumbuhan stabil \u2014 strategi teruji per-pair.',warn:false},
+    highrisk:{d:'\u26a0\ufe0f RISIKO TINGGI: V1 di semua pair. Potensi profit besar TAPI potensi rugi juga besar. Forex high-risk \u2014 bisa rugi cepat.',warn:true}
+  };
+  function paintMode(m){
+    var high=(m==='highrisk');
+    if(modeLowBtn) modeLowBtn.classList.toggle('active',!high);
+    if(modeHighBtn) modeHighBtn.classList.toggle('active',high);
+    if(modeDesc){ var t=MODE_TXT[high?'highrisk':'lowrisk']; modeDesc.textContent=t.d; modeDesc.classList.toggle('warn',t.warn); }
+    try{ localStorage.setItem(MODE_KEY, high?'highrisk':'lowrisk'); }catch(e){}
+  }
+  function setMode(m){
+    var target=(m==='highrisk')?'highrisk':'lowrisk';
+    if(target==='highrisk'){
+      if(!confirm('MODE HIGH RISK\n\nRobot memakai strategi V1 di SEMUA pair. Potensi profit besar, TAPI risiko rugi juga besar. Trading forex berisiko tinggi \u2014 kamu bisa kehilangan dana dengan cepat.\n\nLanjut ke HIGH RISK?')){ return; }
+    }
+    paintMode(target); // optimistic
+    fetch(BE+"/auto/mode",{method:"POST",headers:jfxAuthH({"Content-Type":"application/json"}),body:JSON.stringify({mode:target})})
+      .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {r:r,j:j}; }); })
+      .then(function(o){
+        if(o.r.status===423){ paintMode('lowrisk'); alert('HIGH RISK hanya untuk akun yang sudah disetujui admin untuk live trade.'); return; }
+        if(!o.r.ok || (o.j&&o.j.ok===false)){ throw new Error((o.j&&o.j.error)||('HTTP '+o.r.status)); }
+        var bm=(o.j&&o.j.mode)?o.j.mode:target; paintMode(bm);
+        if(homeStatus){ homeStatus.innerHTML = (bm==='highrisk'?'Mode: HIGH RISK \ud83d\udd25':'Mode: LOW RISK \ud83d\udee1\ufe0f'); }
+      })
+      .catch(function(){ paintMode('lowrisk'); if(homeStatus) homeStatus.innerHTML='Gagal ganti mode, coba lagi'; });
+  }
+  if(modeLowBtn) modeLowBtn.onclick=function(){ setMode('lowrisk'); };
+  if(modeHighBtn) modeHighBtn.onclick=function(){ setMode('highrisk'); };
+  // Toggle SELALU tampil (termasuk DEMO) biar bisa uji coba; sekaligus ambil mode terkini dari server.
+  function refreshModeToggle(){
+    if(!modeToggle) return;
+    modeToggle.style.display='block'; // SELALU tampil, termasuk akun DEMO (buat uji coba kedua otak)
+    var cached=''; try{ cached=localStorage.getItem(MODE_KEY)||''; }catch(e){}
+    paintMode(cached==='highrisk'?'highrisk':'lowrisk');
+    // Sinkron mode terkini dari server (kalau akun sudah tersambung).
+    fetch(BE+'/connect/live-status',{headers:jfxAuthH()})
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(j){ if(j && j.ok && j.mode){ paintMode(j.mode==='highrisk'?'highrisk':'lowrisk'); } })
+      .catch(function(){});
+  }
   function guard(fn){ return function(){ if(!localStorage.getItem(RISK_KEY)){ alert("Set your daily risk limit before choosing a trading mode."); return; } fn(); }; }
   function startEngine(){ _enableThenWarm(); return; /* flow lama (showAuto) dimatikan, diganti UI4 */
     if(homeStatus) homeStatus.innerHTML='Activating autotrade...';
