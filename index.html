@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v37</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;pointer-events:none">v38</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -1071,6 +1071,12 @@ async function jfxClose(id){
   .es-pos.sell .dir{color:#ff7a7a}
   .es-pos .pl.pos{color:#16ffa3}
   .es-pos .pl.neg{color:#ff7a7a}
+  .es-pos{cursor:pointer}
+  .es-pos .es-close{display:none;flex:none;background:#dc2626;color:#fff;border:none;border-radius:.5vw;font-weight:800;font-size:clamp(11px,2.4vw,15px);padding:.3vh 1vw;margin-left:.5vw;cursor:pointer;font-family:inherit;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+  .es-pos .es-close:active{filter:brightness(.88)}
+  .es-pos .es-close:disabled{opacity:.6;cursor:default}
+  .es-pos.open{background:rgba(70,12,12,.5)}
+  .es-pos.open .es-close{display:inline-block}
   .es-empty{font-size:clamp(12px,2.8vw,16px);color:#7fae97;text-align:center;padding:.6vh 0}
   .es-note{font-size:clamp(6px,.66vw,11px);color:#7fae97;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .jfx-end-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:1vw;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .2s ease}
@@ -1296,6 +1302,19 @@ async function jfxClose(id){
   function fmtMoney(v,cur){ if(v==null||isNaN(v)) return '\u2013'; return Number(v).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+(cur?(' '+cur):''); }
   function dirLabel(t){ return /BUY/i.test(t||'')?'BUY':(/SELL/i.test(t||'')?'SELL':((t||'').replace(/POSITION_TYPE_/,''))); }
   function ageStr(sec){ if(sec==null) return ''; if(sec<90) return sec+'s'; if(sec<5400) return Math.round(sec/60)+'m'; return Math.round(sec/3600)+'j'; }
+  function doClosePosition(id, sym, pl, btn){
+    if(!id){ alert('Posisi ini tidak punya ID, tidak bisa ditutup dari sini.'); return; }
+    var plTxt=(pl!==''&&pl!=null)?(' (P/L '+((Number(pl)>=0?'+':'')+pl)+')'):'';
+    if(!confirm('Tutup posisi '+(sym||'')+plTxt+' SEKARANG dengan harga market?\n\nIni menutup manual & mengabaikan TP/SL.')) return;
+    if(btn){ btn.disabled=true; btn.textContent='\u23f3...'; }
+    fetch(BE+'/order/close',{method:'POST',headers:jfxAuthH({'Content-Type':'application/json'}),body:JSON.stringify({positionId:String(id)})})
+      .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {r:r,j:j}; }); })
+      .then(function(o){
+        if(!o.r.ok || (o.j&&o.j.ok===false)){ throw new Error((o.j&&o.j.error)||('HTTP '+o.r.status)); }
+        try{ refreshUI4(); }catch(e){}
+      })
+      .catch(function(e){ alert('Gagal menutup posisi: '+(e&&e.message?e.message:'coba lagi')); if(btn){ btn.disabled=false; btn.textContent='\u2715 Close'; } });
+  }
   function renderUI4(mon, live){
     var mode=document.getElementById('esMode'), eng=document.getElementById('esEngine'),
         bal=document.getElementById('esBal'), eq=document.getElementById('esEq'),
@@ -1323,8 +1342,19 @@ async function jfxClose(id){
     if(!positions.length){ list.innerHTML='<div class="es-empty">'+(on?'no open positions yet':'no positions open')+'</div>'; }
     else { var html='';
       for(var k=0;k<positions.length;k++){ var q=positions[k]; var d=dirLabel(q.type); var prof=Number(q.profit); var cls=(prof>=0?'pos':'neg');
-        html+='<div class="es-pos '+(/BUY/i.test(d)?'buy':'sell')+'"><span class="sym">'+(q.symbol||'?')+' <span class="dir">'+d+'</span> '+(q.volume!=null?q.volume:'')+'</span><span class="pl '+cls+'">'+(isNaN(prof)?'':((prof>=0?'+':'')+prof.toFixed(2)))+'</span></div>'; }
-      list.innerHTML=html; }
+        html+='<div class="es-pos '+(/BUY/i.test(d)?'buy':'sell')+'" data-id="'+(q.id!=null?q.id:'')+'" data-sym="'+(q.symbol||'')+'" data-pl="'+(isNaN(prof)?'':prof.toFixed(2))+'"><span class="sym">'+(q.symbol||'?')+' <span class="dir">'+d+'</span> '+(q.volume!=null?q.volume:'')+'</span><span class="pl '+cls+'">'+(isNaN(prof)?'':((prof>=0?'+':'')+prof.toFixed(2)))+'</span><button class="es-close" type="button">\u2715 Close</button></div>'; }
+      list.innerHTML=html;
+      (function wireClose(){
+        var rows=list.querySelectorAll('.es-pos');
+        for(var ri=0;ri<rows.length;ri++){ (function(row){
+          var btn=row.querySelector('.es-close');
+          row.onclick=function(ev){ if(btn && (ev.target===btn || btn.contains(ev.target))) return;
+            var op=list.querySelectorAll('.es-pos.open'); for(var z=0;z<op.length;z++){ if(op[z]!==row) op[z].classList.remove('open'); }
+            row.classList.toggle('open'); };
+          if(btn) btn.onclick=function(ev){ ev.stopPropagation(); doClosePosition(row.getAttribute('data-id'), row.getAttribute('data-sym'), row.getAttribute('data-pl'), btn); };
+        })(rows[ri]); }
+      })();
+    }
     var fx=document.getElementById('esFx');
     if(fx){ var lbl=document.getElementById('esFxLabel');
       if(kill){ fx.className='jfx-end-fx off'; if(lbl)lbl.textContent='\u25cf TERKUNCI'; }
