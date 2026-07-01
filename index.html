@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v41</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v42</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -528,7 +528,7 @@ function render(R){
   if(R.lots<0.01)msgs.push("Lot ideal ("+R.lots.toFixed(4)+") di bawah minimum broker standar (0.01). Untuk modal $"+R.capital+" gunakan <b>akun Cent/Micro</b> agar risk "+R.riskPct+"% bisa dipatuhi.");
   if(!R.data.live)msgs.push("Kamu dalam <b>Mode Simulasi</b> (data sintetis). Masukkan Twelve Data API key (gratis) di ⚙️ untuk harga & analisa <b>real-time</b>.");
   msgs.push("Hindari entry 30 menit sebelum/sesudah news high-impact. Cek kalender: ForexFactory / Investing.com.");
-  if(msgs.length){const b=document.createElement("div");b.className="warnbox";b.innerHTML="⚠️ "+msgs.join("<br>⚠️ ");w.appendChild(b);}
+  if(msgs.length){const b=document.createElement("div");b.className="warnbox";b.innerHTML="���️ "+msgs.join("<br>⚠️ ");w.appendChild(b);}
 
   // checklist
   const cl=document.getElementById("checklist");cl.innerHTML="";
@@ -1146,7 +1146,7 @@ async function jfxClose(id){
     <div class="jfx-home-hot logout" id="jfxLogout" role="button" tabindex="0" aria-label="Logout"></div>
     <div class="jfx-home-status" id="jfxHomeStatus"></div>
     <div class="jfx-mode-toggle" id="jfxModeToggle" style="display:none">
-      <div class="mt-lbl">MODE OTAK ROBOT</div>
+      <div class="mt-lbl">MODE OTAK SISTEM</div>
       <div class="jfx-mode-pills">
         <div class="jfx-mode-pill low active" id="jfxModeLow" role="button" tabindex="0" aria-label="Low Risk">🛡️ LOW RISK</div>
         <div class="jfx-mode-pill high" id="jfxModeHigh" role="button" tabindex="0" aria-label="High Risk">🔥 HIGH RISK</div>
@@ -1242,7 +1242,7 @@ async function jfxClose(id){
     <button class="jfx-back" id="jfxAutoBack">← Back to Menu</button>
     <div class="jfx-card">
       <div class="jfx-h">🤖 Auto Trade</div>
-      <div class="jfx-sub" style="margin-bottom:16px">The robot analyzes & opens positions automatically on DEMO. Status is pulled directly from the server.</div>
+      <div class="jfx-sub" style="margin-bottom:16px">The system analyzes & opens positions automatically on DEMO. Status is pulled directly from the server.</div>
       <div class="jfx-status off" id="jfxStatusBox"><span id="jfxStatusText">loading…</span></div>
       <div class="jfx-since" id="jfxSince"></div>
       <div class="jfx-ctrl">
@@ -1252,10 +1252,10 @@ async function jfxClose(id){
         <button class="jfx-b jfx-reset" id="jfxReset">🔓 Unlock (Reset)</button>
       </div>
       <div class="jfx-note">
-        🟢 <b>Start</b>: the robot begins working.<br>
-        🔴 <b>Stop</b>: the robot stops (normal).<br>
-        🚨 <b>EMERGENCY STOP</b>: stop + lock. The robot can't start until you <b>Reset</b>.<br>
-        🔓 <b>Reset</b>: unlock (the robot stays off until started again).
+        🟢 <b>Start</b>: the system begins working.<br>
+        🔴 <b>Stop</b>: the system stops (normal).<br>
+        🚨 <b>EMERGENCY STOP</b>: stop + lock. The system can't start until you <b>Reset</b>.<br>
+        🔓 <b>Reset</b>: unlock (the system stays off until started again).
       </div>
     </div>
   </div>
@@ -1534,7 +1534,7 @@ async function jfxClose(id){
   function setMode(m){
     var target=(m==='highrisk')?'highrisk':'lowrisk';
     if(target==='highrisk'){
-      if(!confirm('HIGH RISK MODE\n\nThe robot uses the V1 strategy on ALL pairs. The profit potential is large, BUT the risk of loss is also large. Forex trading is high-risk \u2014 you can lose your funds quickly. But the risk of loss is also large; the system gives you options to minimize bigger losses. Choose wisely.\n\nProceed to HIGH RISK?')){ return; }
+      if(!confirm('HIGH RISK MODE\n\nThe system uses the V1 strategy on ALL pairs. The profit potential is large, BUT the risk of loss is also large. Forex trading is high-risk \u2014 you can lose your funds quickly. But the risk of loss is also large; the system gives you options to minimize bigger losses. Choose wisely.\n\nProceed to HIGH RISK?')){ return; }
     }
     paintMode(target); // optimistic
     fetch(BE+"/auto/mode",{method:"POST",headers:jfxAuthH({"Content-Type":"application/json"}),body:JSON.stringify({mode:target})})
@@ -1565,7 +1565,7 @@ async function jfxClose(id){
   function startEngine(){ _enableThenWarm(); return; /* flow lama (showAuto) dimatikan, diganti UI4 */
     if(homeStatus) homeStatus.innerHTML='Activating autotrade...';
     fetch(BE+"/auto/enable",{method:"POST",headers:jfxAuthH()}).then(function(r){return r.json();})
-      .then(function(j){ if(homeStatus) homeStatus.innerHTML='Autotrade ACTIVE \u2713 robot starting analysis'; })
+      .then(function(j){ if(homeStatus) homeStatus.innerHTML='Autotrade ACTIVE \u2713 system starting analysis'; })
       .catch(function(){ if(homeStatus) homeStatus.innerHTML='Engine ON (enable failed, check connection)'; })
       .finally(function(){ setTimeout(function(){ showAuto(); }, 700); }); }
   document.getElementById('jfxBtnAuto').onclick=guard(startEngine);
@@ -1777,7 +1777,7 @@ async function jfxClose(id){
       '<div style="max-width:360px;width:100%;background:#11161f;border:1px solid #2a3342;border-radius:16px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)">'+
         '<div style="font-size:34px;line-height:1;margin-bottom:10px">⚠️</div>'+
         '<div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px">Real Money Account</div>'+
-        '<div style="font-size:13px;line-height:1.5;color:#c7d0dc;margin-bottom:18px">This is a <b style="color:#ffd166">LIVE account</b>. The robot will trade automatically using <b style="color:#ffd166">REAL money</b> based on your risk settings. Losses are real. Do you want to continue?</div>'+
+        '<div style="font-size:13px;line-height:1.5;color:#c7d0dc;margin-bottom:18px">This is a <b style="color:#ffd166">LIVE account</b>. The system will trade automatically using <b style="color:#ffd166">REAL money</b> based on your risk settings. Losses are real. Do you want to continue?</div>'+
         '<button id="jfxLiveYes" style="width:100%;padding:13px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:10px">Yes, trade with real money</button>'+
         '<button id="jfxLiveNo" style="width:100%;padding:12px;border:1px solid #2a3342;border-radius:10px;background:transparent;color:#c7d0dc;font-weight:700;font-size:14px;cursor:pointer">Cancel</button>'+
       '</div>';
