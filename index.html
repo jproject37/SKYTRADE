@@ -123,7 +123,7 @@ canvas#chart{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v42</div>
+<div id="jfxVerBadge" style="position:fixed;left:6px;bottom:6px;z-index:2147483647;font:700 11px monospace;color:#7CFC00;background:rgba(0,0,0,.55);padding:2px 6px;border-radius:6px;cursor:pointer">v43</div>
 <div class="wrap">
   <header class="top">
     <div class="logo">S</div>
@@ -862,6 +862,9 @@ async function jfxClose(id){
   .jfx-home-risk.r4{left:57%}
   .jfx-home-risk:active{transform:translate(-50%,-50%) scale(.93)}
   .jfx-home-risk.active{box-shadow:0 0 20px 5px rgba(40,255,140,.7);border:2px solid rgba(140,255,190,.95);background:rgba(40,255,140,.16)}
+  /* Guided flow: daily-risk pills disembunyikan sampai user memilih mode */
+  #jfxHome .jfx-home-risk{display:none}
+  #jfxHome.jfx-show-risk .jfx-home-risk{display:block}
   .jfx-home-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:14px;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
   .jfx-home-hot.start{left:49.9%;top:70.75%;width:22%;height:9%}
   .jfx-home-hot.start.locked{cursor:not-allowed}
@@ -1537,24 +1540,41 @@ async function jfxClose(id){
       if(!confirm('HIGH RISK MODE\n\nThe system uses the V1 strategy on ALL pairs. The profit potential is large, BUT the risk of loss is also large. Forex trading is high-risk \u2014 you can lose your funds quickly. But the risk of loss is also large; the system gives you options to minimize bigger losses. Choose wisely.\n\nProceed to HIGH RISK?')){ return; }
     }
     paintMode(target); // optimistic
+    _modeChosen=true; homeStepRisk(); // guided flow: sembunyikan toggle, munculkan step daily-risk
     fetch(BE+"/auto/mode",{method:"POST",headers:jfxAuthH({"Content-Type":"application/json"}),body:JSON.stringify({mode:target})})
       .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {r:r,j:j}; }); })
       .then(function(o){
         if(o.r.status===423){ paintMode('lowrisk'); alert('HIGH RISK hanya untuk akun yang sudah disetujui admin untuk live trade.'); return; }
         if(!o.r.ok || (o.j&&o.j.ok===false)){ throw new Error((o.j&&o.j.error)||('HTTP '+o.r.status)); }
         var bm=(o.j&&o.j.mode)?o.j.mode:target; paintMode(bm);
-        if(homeStatus){ homeStatus.innerHTML = (bm==='highrisk'?'Mode: HIGH RISK \ud83d\udd25':'Mode: LOW RISK \ud83d\udee1\ufe0f'); }
+        if(homeStatus){ var _hasR=!!localStorage.getItem(RISK_KEY); homeStatus.innerHTML = (bm==='highrisk'?'Mode: HIGH RISK \ud83d\udd25':'Mode: LOW RISK \ud83d\udee1\ufe0f') + (_hasR?'':' \u2014 now choose your daily risk'); }
       })
       .catch(function(){ paintMode('lowrisk'); if(homeStatus) homeStatus.innerHTML='Gagal ganti mode, coba lagi'; });
   }
   if(modeLowBtn) modeLowBtn.onclick=function(){ setMode('lowrisk'); };
   if(modeHighBtn) modeHighBtn.onclick=function(){ setMode('highrisk'); };
   // Toggle SELALU tampil (termasuk DEMO) biar bisa uji coba; sekaligus ambil mode terkini dari server.
+  var _modeChosen=false;
+  function homeStepMode(){ // Step 1: pilih mode dulu
+    var hEl=document.getElementById('jfxHome');
+    if(modeToggle) modeToggle.style.display='block';
+    if(hEl) hEl.classList.remove('jfx-show-risk');
+    try{ lockModes(true); }catch(e){}
+    if(homeStatus) homeStatus.innerHTML='Step 1 of 2 \u2014 choose your mode';
+  }
+  function homeStepRisk(){ // Step 2: toggle hilang, pilih daily risk
+    var hEl=document.getElementById('jfxHome');
+    if(modeToggle) modeToggle.style.display='none';
+    if(hEl) hEl.classList.add('jfx-show-risk');
+    var hasRisk=!!localStorage.getItem(RISK_KEY);
+    try{ lockModes(!hasRisk); }catch(e){}
+    if(homeStatus && !hasRisk) homeStatus.innerHTML='Step 2 of 2 \u2014 choose your daily risk';
+  }
   function refreshModeToggle(){
     if(!modeToggle) return;
-    modeToggle.style.display='block'; // SELALU tampil, termasuk akun DEMO (buat uji coba kedua otak)
     var cached=''; try{ cached=localStorage.getItem(MODE_KEY)||''; }catch(e){}
     paintMode(cached==='highrisk'?'highrisk':'lowrisk');
+    if(_modeChosen){ homeStepRisk(); } else { homeStepMode(); }
     // Sinkron mode terkini dari server (kalau akun sudah tersambung).
     fetch(BE+'/connect/live-status',{headers:jfxAuthH()})
       .then(function(r){ return r.json().catch(function(){return null;}); })
@@ -1579,6 +1599,7 @@ async function jfxClose(id){
     if(st)st.innerHTML='';
     try{ highlightRisk(0); if(homeStatus) homeStatus.innerHTML=''; }catch(e){}
     try{ lockModes(true); }catch(e){}
+    _modeChosen=false;
     showAuthScreen();
   }
   document.getElementById('jfxLogout').onclick=logout;
