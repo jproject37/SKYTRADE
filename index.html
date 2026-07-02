@@ -867,15 +867,15 @@ async function jfxClose(id){
   #jfxHome.jfx-show-risk .jfx-home-risk{display:block}
   .jfx-home-hot{position:absolute;transform:translate(-50%,-50%);cursor:pointer;border-radius:14px;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
   .jfx-home-hot.start{left:49.9%;top:70.75%;width:22%;height:9%}
-  .jfx-home-hot.start.locked{cursor:not-allowed}
+  .jfx-home-hot.start.locked{cursor:not-allowed;pointer-events:none}
   .jfx-home-hot.logout{left:49.6%;top:80.5%;width:11%;height:5%}
   .jfx-home-hot:active{transform:translate(-50%,-50%) scale(.96)}
   .jfx-home-status{position:absolute;left:49.7%;top:87.3%;transform:translate(-50%,-50%);width:24%;height:5.2%;display:flex;align-items:center;justify-content:center;text-align:center;color:#aef5cf;font-size:clamp(12px,2.5vw,20px);font-weight:700;line-height:1.2;overflow:hidden;padding:0 1%;box-sizing:border-box}
   /* ===== MODE OTAK ROBOT (muncul HANYA setelah akun live-approved admin) ===== */
-  .jfx-mode-toggle{position:absolute;left:50%;top:57.4%;transform:translate(-50%,-50%);width:47%;box-sizing:border-box;background:rgba(6,10,20,.82);border:1px solid rgba(124,180,255,.28);border-radius:12px;padding:1.4% 1.6%;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 8px 26px rgba(0,0,0,.5);z-index:3}
-  .jfx-mode-toggle .mt-lbl{font-size:clamp(10px,1.5vw,16px);font-weight:800;letter-spacing:.06em;color:#cbd6ff;text-align:center;margin-bottom:5%}
+  .jfx-mode-toggle{position:absolute;left:50%;top:auto;bottom:35.5%;transform:translateX(-50%);width:min(47%,88vw);box-sizing:border-box;background:rgba(6,10,20,.82);border:1px solid rgba(124,180,255,.28);border-radius:12px;padding:1.4% 1.6%;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 8px 26px rgba(0,0,0,.5);z-index:3}
+  .jfx-mode-toggle .mt-lbl{font-size:clamp(10px,1.5vw,16px);font-weight:800;letter-spacing:.06em;color:#cbd6ff;text-align:center;margin-bottom:4%}
   .jfx-mode-pills{display:flex;gap:5%}
-  .jfx-mode-pill{flex:1;border:1px solid rgba(124,180,255,.22);background:#0b0f1a;color:#9aa3bd;font-weight:800;font-size:clamp(11px,1.7vw,18px);font-family:inherit;padding:9% 2%;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,filter .12s;white-space:nowrap;overflow:hidden;text-align:center}
+  .jfx-mode-pill{flex:1;min-width:0;border:1px solid rgba(124,180,255,.22);background:#0b0f1a;color:#9aa3bd;font-weight:800;font-size:clamp(9px,3vw,16px);font-family:inherit;padding:11% 3%;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,filter .12s;white-space:nowrap;overflow:hidden;text-align:center}
   .jfx-mode-pill:active{transform:scale(.95)}
   .jfx-mode-pill.low.active{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border-color:transparent}
   .jfx-mode-pill.high.active{background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;border-color:transparent}
