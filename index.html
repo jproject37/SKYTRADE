@@ -1077,6 +1077,9 @@ async function jfxClose(id){
   .es-pos{cursor:pointer}
   .es-pos .es-close{display:none;flex:none;background:#dc2626;color:#fff;border:none;border-radius:.5vw;font-weight:800;font-size:clamp(11px,2.4vw,15px);padding:.3vh 1vw;margin-left:.5vw;cursor:pointer;font-family:inherit;white-space:nowrap;-webkit-tap-highlight-color:transparent}
   .es-pos .es-close:active{filter:brightness(.88)}
+  .es-pos.pend{background:rgba(44,32,2,.4);border-left:2px solid #f5b442;cursor:default}
+  .es-pos .pl.pend{color:#f5c86b;font-weight:700}
+  #esPendHead{color:#f5c86b;margin-top:.6vh}
   .es-pos .es-close:disabled{opacity:.6;cursor:default}
   .es-pos.open{background:rgba(70,12,12,.5)}
   .es-pos.open .es-close{display:inline-block}
@@ -1224,6 +1227,8 @@ async function jfxClose(id){
       <div class="es-pl" id="esPl">Floating P/L: –</div>
       <div class="es-poshead"><span id="esPosCount">0 positions</span><span id="esSince"></span></div>
       <div class="es-poslist" id="esPosList"><div class="es-empty">loading data…</div></div>
+      <div class="es-poshead" id="esPendHead" style="display:none"><span id="esPendCount">0 pending</span><span></span></div>
+      <div class="es-poslist" id="esPendList" style="display:none;flex:none;max-height:26%"></div>
     </div>
     <div class="jfx-end-hot off"   id="endOff"   role="button" tabindex="0" aria-label="Turn Off Engine"></div>
     <div class="jfx-end-hot kill"  id="endKill"  role="button" tabindex="0" aria-label="Kill Switch"></div>
@@ -1364,11 +1369,28 @@ async function jfxClose(id){
         })(rows[ri]); }
       })();
     }
+    // ===== PENDING ORDERS (limit/stop, menunggu harga sentuh entry) =====
+    var pendHead=document.getElementById('esPendHead'), pendList=document.getElementById('esPendList'), pendCount=document.getElementById('esPendCount');
+    var pend=(mon&&mon.snapshot&&mon.snapshot.orders)?mon.snapshot.orders:[];
+    if(pendHead&&pendList){
+      if(!pend.length){ pendHead.style.display='none'; pendList.style.display='none'; pendList.innerHTML=''; }
+      else {
+        pendHead.style.display='flex'; pendList.style.display='flex';
+        if(pendCount) pendCount.textContent='\u23f3 '+pend.length+' pending order'+(pend.length>1?'s':'');
+        var ph='';
+        for(var pi=0;pi<pend.length;pi++){ var o=pend[pi]; var od=dirLabel(o.type);
+          var otype=/LIMIT/i.test(o.type||'')?' LIMIT':(/STOP/i.test(o.type||'')?' STOP':'');
+          ph+='<div class="es-pos pend '+(/BUY/i.test(od)?'buy':'sell')+'"><span class="sym">'+(o.symbol||'?')+' <span class="dir">'+od+otype+'</span> '+(o.volume!=null?o.volume:'')+'</span><span class="pl pend">@ '+(o.openPrice!=null?o.openPrice:'')+'</span></div>';
+        }
+        pendList.innerHTML=ph;
+      }
+    }
     var fx=document.getElementById('esFx');
     if(fx){ var lbl=document.getElementById('esFxLabel');
       if(kill){ fx.className='jfx-end-fx off'; if(lbl)lbl.textContent='\u25cf TERKUNCI'; }
       else if(on){
         if(positions.length>0){ fx.className='jfx-end-fx live'; if(lbl)lbl.textContent='\u25cf LIVE TRADING NOW'; }
+        else if(pend.length>0){ fx.className='jfx-end-fx'; if(lbl)lbl.textContent='\u25cf '+pend.length+' PENDING ORDER WAITING'; }
         else { fx.className='jfx-end-fx'; if(lbl)lbl.textContent='\u25cf ANALYZING MARKET'; }
       }
       else { fx.className='jfx-end-fx off'; if(lbl)lbl.textContent='\u25cf ENGINE OFF'; }
@@ -1843,7 +1865,7 @@ var box=document.getElementById('jfxStatusBox'),
 t=document.getElementById('jfxStatusText'),
 s=document.getElementById('jfxSince');
 if(a.killSwitch){ box.className='jfx-status kill'; t.textContent='🚨 LOCKED'; }
-else if(a.enabled){ box.className='jfx-status on'; t.textContent='🟢 ON'; }
+else if(a.enabled){ box.className='jfx-status on'; t.textContent='��� ON'; }
 else { box.className='jfx-status off'; t.textContent='🔴 OFF'; }
 if(a.since){ try{ s.textContent='Last changed: '+new Date(a.since).toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})+' WIB'; }catch(e){} }
 }
